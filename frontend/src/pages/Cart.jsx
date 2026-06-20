@@ -81,7 +81,7 @@ const Cart = () => {
 
     return (
         <div className="pt-32 pb-24 bg-brand-cream min-h-screen">
-            <div className="max-w-[1920px] mx-auto px-6 sm:px-12 lg:px-20">
+            <div className="max-w-full mx-auto px-6 sm:px-12 lg:px-20">
                 <div className="flex items-center gap-4 mb-12">
                     <div className="bg-brand-light p-3 rounded-2xl text-brand-brown">
                         <ShoppingBag size={30} />

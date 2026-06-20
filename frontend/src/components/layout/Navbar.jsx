@@ -25,6 +25,8 @@ const Navbar = () => {
         { name: 'Home', path: '/' },
         { name: 'Shop', path: '/shop' },
         { name: 'About', path: '/about' },
+        { name: 'Services', path: '/services' },
+        { name: 'Blog', path: '/blog' },
         { name: 'Export', path: '/export' },
         { name: 'Wholesale', path: '/wholesale' },
         { name: 'Contact', path: '/contact' },
@@ -40,7 +42,7 @@ const Navbar = () => {
                 : 'bg-transparent py-6'
             }`}
         >
-            <div className="max-w-[1920px] mx-auto px-6 sm:px-12 lg:px-20 flex justify-between items-center">
+            <div className="max-w-full mx-auto px-6 sm:px-12 lg:px-20 flex justify-between items-center">
                 {/* Logo */}
                 <Link to="/" className="group flex items-center gap-3">
                     <motion.div 
@@ -102,7 +104,7 @@ const Navbar = () => {
                         <motion.div 
                             whileHover={{ scale: 1.05 }}
                             whileTap={{ scale: 0.95 }}
-                            className={`p-3 rounded-2xl transition-all duration-500 bg-brand-red text-white shadow-xl shadow-brand-red/30 hover:bg-brand-darkRed`}
+                            className={`p-3 rounded-2xl transition-all duration-500 bg-gray-900 text-white shadow-xl shadow-gray-900/30 hover:bg-gray-800`}
                         >
                             <ShoppingCart size={20} />
                         </motion.div>
@@ -112,7 +114,7 @@ const Navbar = () => {
                                     initial={{ scale: 0, opacity: 0 }}
                                     animate={{ scale: 1, opacity: 1 }}
                                     exit={{ scale: 0, opacity: 0 }}
-                                    className={`absolute -top-1.5 -right-1.5 text-[11px] font-black rounded-full h-5 w-5 flex items-center justify-center border-2 shadow-md bg-white text-brand-red border-white`}
+                                    className={`absolute -top-1.5 -right-1.5 text-[11px] font-black rounded-full h-5 w-5 flex items-center justify-center border-2 shadow-md bg-brand-red text-gray-900 border-brand-red`}
                                 >
                                     {cartCount}
                                 </motion.span>

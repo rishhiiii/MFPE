@@ -32,17 +32,10 @@ const Features = () => {
 
     return (
         <section className="py-16 bg-white">
-            <div className="max-w-[1920px] mx-auto px-6 sm:px-12 lg:px-20">
+            <div className="max-w-full mx-auto px-6 sm:px-12 lg:px-20">
                 <div className="flex flex-col lg:flex-row items-end justify-between gap-8 mb-16">
                     <div className="max-w-3xl">
-                        <motion.div 
-                            initial={{ opacity: 0, y: 20 }}
-                            whileInView={{ opacity: 1, y: 0 }}
-                            viewport={{ once: true }}
-                            className="inline-block bg-brand-cream text-brand-brown px-4 py-1.5 rounded-xl font-black text-[10px] uppercase tracking-[0.2em] mb-4"
-                        >
-                            Our Standard
-                        </motion.div>
+
                         <motion.h2 
                             initial={{ opacity: 0, y: 20 }}
                             whileInView={{ opacity: 1, y: 0 }}

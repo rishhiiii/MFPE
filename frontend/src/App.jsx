@@ -10,16 +10,18 @@ import About from './pages/About';
 import Contact from './pages/Contact';
 import Export from './pages/Export';
 import Wholesale from './pages/Wholesale';
+import Blog from './pages/Blog';
+import Services from './pages/Services';
 import { CartProvider } from './context/CartContext';
 import { AnimatePresence } from 'framer-motion';
 
-const Checkout = () => <div className="pt-32 min-h-screen bg-brand-cream text-center"><h1>Checkout</h1><p>Checkout flow coming soon...</p></div>;
+const Checkout = () => <div className="pt-32 min-h-screen  text-center"><h1>Checkout</h1><p>Checkout flow coming soon...</p></div>;
 
 function App() {
   return (
     <CartProvider>
       <Router>
-        <div className="min-h-screen bg-brand-cream">
+        <div className="min-h-screen ">
           <Navbar />
           <main>
             <AnimatePresence mode="wait">
@@ -33,6 +35,8 @@ function App() {
                 <Route path="/contact" element={<Contact />} />
                 <Route path="/export" element={<Export />} />
                 <Route path="/wholesale" element={<Wholesale />} />
+                <Route path="/blog" element={<Blog />} />
+                <Route path="/services" element={<Services />} />
               </Routes>
             </AnimatePresence>
           </main>

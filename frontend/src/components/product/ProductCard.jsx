@@ -61,18 +61,7 @@ const ProductCard = ({ product }) => {
                         </button>
                 </div>
 
-                {/* Status Badge */}
-                <div className="absolute top-6 left-6">
-                    {product.stock < 10 && product.stock > 0 ? (
-                        <span className="bg-white/90 backdrop-blur-md text-brand-brown text-[10px] font-black px-4 py-1.5 rounded-full uppercase tracking-widest">
-                            Limited Stock
-                        </span>
-                    ) : (
-                        <span className="bg-white/90 backdrop-blur-md text-gray-900 text-[10px] font-black px-4 py-1.5 rounded-full uppercase tracking-widest">
-                            {product.category}
-                        </span>
-                    )}
-                </div>
+
             </div>
 
             <div className="mt-6 space-y-2">

@@ -70,7 +70,7 @@ const Blog = () => {
 
     return (
         <div className="pt-32 pb-24 bg-brand-cream min-h-screen">
-            <div className="max-w-[1920px] mx-auto px-6 sm:px-12 lg:px-20">
+            <div className="max-w-full mx-auto px-6 sm:px-12 lg:px-20">
                 <div className="max-w-4xl mx-auto text-center mb-24">
                     <motion.div
                         initial={{ opacity: 0, y: 20 }}
@@ -137,11 +137,7 @@ const Blog = () => {
                                         alt={post.title} 
                                         className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110"
                                     />
-                                    <div className="absolute top-6 left-6">
-                                        <span className="bg-white/90 backdrop-blur-md px-5 py-2 rounded-xl font-black text-[10px] uppercase tracking-widest text-brand-brown">
-                                            {post.category}
-                                        </span>
-                                    </div>
+
                                 </div>
                                 
                                 <div className="flex items-center gap-6 mb-4 text-gray-400 font-bold text-xs uppercase tracking-widest">

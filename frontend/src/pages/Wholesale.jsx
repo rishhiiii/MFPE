@@ -26,7 +26,7 @@ const Wholesale = () => {
 
     return (
         <div className="pt-32 pb-24 bg-brand-cream min-h-screen">
-            <div className="max-w-[1920px] mx-auto px-6 sm:px-12 lg:px-20">
+            <div className="max-w-full mx-auto px-6 sm:px-12 lg:px-20">
                 {/* Hero Section */}
                 <div className="text-center mb-24">
                     <motion.div

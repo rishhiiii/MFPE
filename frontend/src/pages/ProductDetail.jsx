@@ -76,7 +76,7 @@ const ProductDetail = () => {
 
     return (
         <div className="pt-32 pb-24 bg-brand-cream">
-            <div className="max-w-[1920px] mx-auto px-6 sm:px-12 lg:px-20">
+            <div className="max-w-full mx-auto px-6 sm:px-12 lg:px-20">
                 {/* Breadcrumbs */}
                 <div className="flex items-center gap-3 text-sm font-bold text-gray-400 mb-12 uppercase tracking-widest">
                     <Link to="/" className="hover:text-gray-900 transition-colors">Home</Link>
@@ -99,18 +99,7 @@ const ProductDetail = () => {
                                 alt={product.name} 
                                 className="w-full h-full object-cover transition-transform duration-1000 group-hover:scale-105" 
                             />
-                            
-                            {/* Floating Badges */}
-                            <div className="absolute top-8 left-8 flex flex-col gap-3">
-                                <span className="bg-white/90 backdrop-blur-md px-5 py-2 rounded-xl font-black text-[10px] uppercase tracking-widest text-brand-brown shadow-sm">
-                                    {product.category}
-                                </span>
-                                {product.stock < 10 && (
-                                    <span className="bg-brand-brown text-white px-5 py-2 rounded-xl font-black text-[10px] uppercase tracking-widest shadow-lg">
-                                        Limited Stock
-                                    </span>
-                                )}
-                            </div>
+
 
                             {/* Wishlist Button */}
                             <button className="absolute top-8 right-8 w-14 h-14 bg-white rounded-2xl flex items-center justify-center text-gray-400 hover:text-brand-brown shadow-xl transition-all hover:scale-110 active:scale-95">
