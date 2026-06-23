@@ -1,10 +1,11 @@
-import React from 'react';
-import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
+import React, { useEffect } from 'react';
+import { BrowserRouter as Router, Routes, Route, useLocation } from 'react-router-dom';
 import Navbar from './components/layout/Navbar';
 import Footer from './components/layout/Footer';
 import Home from './pages/Home';
 import Shop from './pages/Shop';
 import Cart from './pages/Cart';
+import Wishlist from './pages/Wishlist';
 import ProductDetail from './pages/ProductDetail';
 import About from './pages/About';
 import Contact from './pages/Contact';
@@ -17,10 +18,21 @@ import { AnimatePresence } from 'framer-motion';
 
 const Checkout = () => <div className="pt-32 min-h-screen  text-center"><h1>Checkout</h1><p>Checkout flow coming soon...</p></div>;
 
+function ScrollToTop() {
+  const location = useLocation();
+  
+  useEffect(() => {
+    window.scrollTo(0, 0);
+  }, [location]);
+  
+  return null;
+}
+
 function App() {
   return (
     <CartProvider>
       <Router>
+        <ScrollToTop />
         <div className="min-h-screen ">
           <Navbar />
           <main>
@@ -37,6 +49,7 @@ function App() {
                 <Route path="/wholesale" element={<Wholesale />} />
                 <Route path="/blog" element={<Blog />} />
                 <Route path="/services" element={<Services />} />
+                <Route path="/wishlist" element={<Wishlist />} />
               </Routes>
             </AnimatePresence>
           </main>

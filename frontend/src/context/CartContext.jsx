@@ -10,9 +10,18 @@ export const CartProvider = ({ children }) => {
         return savedCart ? JSON.parse(savedCart) : [];
     });
 
+    const [wishlistItems, setWishlistItems] = useState(() => {
+        const savedWishlist = localStorage.getItem('wishlist');
+        return savedWishlist ? JSON.parse(savedWishlist) : [];
+    });
+
     useEffect(() => {
         localStorage.setItem('cart', JSON.stringify(cartItems));
     }, [cartItems]);
+
+    useEffect(() => {
+        localStorage.setItem('wishlist', JSON.stringify(wishlistItems));
+    }, [wishlistItems]);
 
     const addToCart = (product) => {
         setCartItems(prev => {
@@ -30,10 +39,31 @@ export const CartProvider = ({ children }) => {
 
     const clearCart = () => setCartItems([]);
 
+    const addToWishlist = (product) => {
+        setWishlistItems(prev => {
+            const existing = prev.find(item => item._id === product._id);
+            if (existing) return prev;
+            return [...prev, product];
+        });
+    };
+
+    const removeFromWishlist = (id) => {
+        setWishlistItems(prev => prev.filter(item => item._id !== id));
+    };
+
     const totalPrice = cartItems.reduce((acc, item) => acc + item.price * item.qty, 0);
 
     return (
-        <CartContext.Provider value={{ cartItems, addToCart, removeFromCart, clearCart, totalPrice }}>
+        <CartContext.Provider value={{ 
+            cartItems, 
+            wishlistItems,
+            addToCart, 
+            removeFromCart, 
+            clearCart, 
+            addToWishlist,
+            removeFromWishlist,
+            totalPrice 
+        }}>
             {children}
         </CartContext.Provider>
     );

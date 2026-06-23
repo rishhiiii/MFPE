@@ -1,83 +1,101 @@
 import React from 'react';
 import { motion } from 'framer-motion';
-import { Leaf, Award, Clock, Heart, ShieldCheck, Globe, Star, ChevronRight } from 'lucide-react';
+import { Leaf, Award, Clock, Heart, ShieldCheck, Globe, Star, CheckCircle2 } from 'lucide-react';
 
 const Features = () => {
     const features = [
         {
-            icon: <Leaf className="w-10 h-10" />,
-            title: "100% Organic",
-            desc: "Sourced directly from certified organic farms without any chemicals.",
-            color: "text-brand-brown"
+            icon: <Leaf size={24} />,
+            title: "100% Organic & Natural",
+            desc: "Made from carefully selected sugarcane using traditional methods without harmful chemicals.",
         },
         {
-            icon: <Award className="w-10 h-10" />,
-            title: "Traditional Process",
-            desc: "We use age-old methods to preserve the natural nutrients and taste.",
-            color: "text-brand-brown"
+            icon: <Award size={24} />,
+            title: "Since 1994",
+            desc: "Over 30 years of experience in delivering trusted, high-quality food products.",
         },
         {
-            icon: <ShieldCheck className="w-10 h-10" />,
-            title: "Quality Tested",
-            desc: "Every batch undergoes rigorous quality checks before leaving our facility.",
-            color: "text-brand-brown"
+            icon: <Clock size={24} />,
+            title: "Traditional Jain Processing",
+            desc: "Prepared following time-honored Jain methods that preserve purity, authenticity, and natural goodness.",
         },
         {
-            icon: <Globe className="w-10 h-10" />,
-            title: "Heritage Recipes",
-            desc: "Authentic flavors passed down through generations of food artisans.",
-            color: "text-brand-brown"
+            icon: <ShieldCheck size={24} />,
+            title: "No Harmful Chemicals",
+            desc: "Free from artificial chemicals, preservatives, and synthetic additives.",
+        },
+        {
+            icon: <Heart size={24} />,
+            title: "No Added Sugar",
+            desc: "Naturally sweet with no refined sugar added.",
+        },
+        {
+            icon: <Star size={24} />,
+            title: "Natural Color & Authentic Taste",
+            desc: "Retains the original color, aroma, and rich taste of pure sugarcane jaggery.",
+        },
+        {
+            icon: <Globe size={24} />,
+            title: "Rich in Essential Minerals",
+            desc: "A natural source of iron and other essential nutrients that support a healthy lifestyle.",
+        },
+        {
+            icon: <Award size={24} />,
+            title: "Hygienically Processed & Packed",
+            desc: "Manufactured and packed under strict quality and hygiene standards.",
+        },
+        {
+            icon: <ShieldCheck size={24} />,
+            title: "Premium Quality Assurance",
+            desc: "Every batch undergoes careful quality checks to ensure consistency and excellence.",
+        },
+        {
+            icon: <Globe size={24} />,
+            title: "Trusted by Customers",
+            desc: "Committed to providing pure, wholesome, and natural food products to families across India and beyond.",
         }
     ];
 
     return (
-        <section className="py-16 bg-white">
+        <section className="py-8 bg-white">
             <div className="max-w-full mx-auto px-6 sm:px-12 lg:px-20">
-                <div className="flex flex-col lg:flex-row items-end justify-between gap-8 mb-16">
+                <div className="flex flex-col lg:flex-row items-end justify-between gap-8 mb-12">
                     <div className="max-w-3xl">
 
                         <motion.h2 
                             initial={{ opacity: 0, y: 20 }}
                             whileInView={{ opacity: 1, y: 0 }}
                             viewport={{ once: true }}
-                            transition={{ delay: 0.1 }}
-                            className="text-4xl md:text-6xl font-black text-gray-900 leading-[0.9] tracking-tighter"
+                            className="text-3xl md:text-4xl font-medium text-gray-900 leading-[1.1] tracking-tighter"
                         >
-                            Why Choose <br />
-                            <span className="text-brand-brown">Mahaveer Food?</span>
+                            Why Choose <span className="text-brand-brown">Mahaveer Food?</span>
                         </motion.h2>
                     </div>
                     <motion.p 
                         initial={{ opacity: 0, y: 20 }}
                         whileInView={{ opacity: 1, y: 0 }}
                         viewport={{ once: true }}
-                        transition={{ delay: 0.2 }}
-                        className="text-lg text-gray-600 font-medium max-w-md leading-relaxed"
+                        className="text-lg text-gray-600 max-w-md leading-relaxed"
                     >
                         We are committed to bringing you the highest quality food products that combine health with the rich taste of tradition.
                     </motion.p>
                 </div>
 
-                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-10">
+                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-6">
                     {features.map((feature, idx) => (
                         <motion.div
                             key={idx}
-                            initial={{ opacity: 0, y: 30 }}
+                            initial={{ opacity: 0, y: 20 }}
                             whileInView={{ opacity: 1, y: 0 }}
                             viewport={{ once: true }}
-                            transition={{ delay: idx * 0.1, duration: 0.8 }}
+                            transition={{ delay: idx * 0.05, duration: 0.8 }}
                             className="group relative"
                         >
-                            <div className="mb-6 inline-flex p-5 rounded-2xl bg-gray-50 group-hover:bg-brand-cream group-hover:text-brand-brown transition-all duration-500">
-                                {React.cloneElement(feature.icon, { className: "w-8 h-8" })}
+                            <div className="mb-4 inline-flex p-4 rounded-xl bg-brand-cream text-brand-brown">
+                                {React.cloneElement(feature.icon, { className: "w-6 h-6" })}
                             </div>
-                            <h3 className="text-xl font-black text-gray-900 mb-3 group-hover:text-brand-brown transition-colors duration-300">{feature.title}</h3>
-                            <p className="text-base text-gray-600 font-medium leading-relaxed group-hover:text-gray-700 transition-colors duration-300">{feature.desc}</p>
-                            
-                            <div className="mt-6 flex items-center gap-2 text-brand-brown opacity-0 group-hover:opacity-100 transition-all duration-500 translate-x-[-10px] group-hover:translate-x-0">
-                                <span className="font-black text-[10px] uppercase tracking-widest">Learn More</span>
-                                <ChevronRight size={14} strokeWidth={3} />
-                            </div>
+                            <h3 className="text-lg font-medium text-gray-900 mb-2 group-hover:text-brand-brown transition-colors">{feature.title}</h3>
+                            <p className="text-sm text-gray-600 leading-relaxed">{feature.desc}</p>
                         </motion.div>
                     ))}
                 </div>

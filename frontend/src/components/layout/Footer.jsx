@@ -33,7 +33,7 @@ const Footer = () => {
 
                     {/* Quick Links */}
                     <div>
-                        <h3 className="text-xl font-heading font-bold mb-8 text-gray-900">Quick Links</h3>
+                        <h3 className="text-xl  font-bold mb-8 text-gray-900">Quick Links</h3>
                         <ul className="space-y-4 text-gray-700 font-body font-medium">
                             {[
                                 { name: 'Home', path: '/' },
@@ -60,7 +60,7 @@ const Footer = () => {
 
                     {/* Categories */}
                     <div>
-                        <h3 className="text-xl font-heading font-bold mb-8 text-gray-900">Categories</h3>
+                        <h3 className="text-xl  font-bold mb-8 text-gray-900">Categories</h3>
                         <ul className="space-y-4 text-gray-700 font-body font-medium">
                             {['Organic Superfoods', 'Spices & Seasonings', 'Natural Sweeteners', 'Pulses & Grains', 'Dry Fruits & Nuts', 'FMCG Products'].map((link) => (
                                 <li key={link}>
@@ -75,7 +75,7 @@ const Footer = () => {
 
                     {/* Contact Info */}
                     <div>
-                        <h3 className="text-xl font-heading font-bold mb-8 text-gray-900">Get In Touch</h3>
+                        <h3 className="text-xl  font-bold mb-8 text-gray-900">Get In Touch</h3>
                         <ul className="space-y-6 text-gray-700 font-body font-medium">
                             <li className="flex items-start gap-4">
                                 <div className="bg-brand-brown/10 p-2.5 rounded-xl text-brand-brown">
@@ -87,13 +87,13 @@ const Footer = () => {
                                 <div className="bg-brand-brown/10 p-2.5 rounded-xl text-brand-brown">
                                     <Phone size={20} />
                                 </div>
-                                <span>+91 99999 99999</span>
+                                <span>+91 9669993888</span>
                             </li>
                             <li className="flex items-center gap-4">
                                 <div className="bg-brand-brown/10 p-2.5 rounded-xl text-brand-brown">
                                     <Mail size={20} />
                                 </div>
-                                <span>info@mahaveerfood.com</span>
+                                <span>mahaveermfpe@gmail.com</span>
                             </li>
                         </ul>
                     </div>

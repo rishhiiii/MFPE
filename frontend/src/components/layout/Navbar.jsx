@@ -1,17 +1,18 @@
 import React, { useState, useEffect } from 'react';
 import { Link, useLocation } from 'react-router-dom';
 import { ShoppingCart, Menu, X, User, Search, Heart } from 'lucide-react';
-import { motion, AnimatePresence, useScroll, useTransform } from 'framer-motion';
+import { motion, AnimatePresence } from 'framer-motion';
 import { useCart } from '../../context/CartContext';
 import mfpeLogo from '../../assets/mfpelogo.jpeg';
 
 const Navbar = () => {
-    const { cartItems } = useCart();
+    const { cartItems, wishlistItems } = useCart();
     const [isScrolled, setIsScrolled] = useState(false);
     const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
     const location = useLocation();
     
     const cartCount = cartItems.reduce((acc, item) => acc + item.qty, 0);
+    const wishlistCount = wishlistItems.length;
 
     useEffect(() => {
         const handleScroll = () => {
@@ -38,7 +39,7 @@ const Navbar = () => {
             animate={{ y: 0 }}
             className={`fixed top-0 w-full z-[100] transition-all duration-500 ${
                 isScrolled 
-                ? 'bg-white/80 backdrop-blur-xl border-b border-brand-brown/10 py-3 shadow-sm' 
+                ? 'bg-white/95 backdrop-blur-xl border-b border-brand-brown/10 py-3 shadow-md' 
                 : 'bg-transparent py-6'
             }`}
         >
@@ -48,11 +49,7 @@ const Navbar = () => {
                     <motion.div 
                         whileHover={{ scale: 1.1, rotate: 5 }}
                         whileTap={{ scale: 0.9 }}
-                        className={`p-0 rounded-full overflow-hidden transition-all duration-300 ${
-                            isScrolled 
-                            ? 'bg-white shadow-lg shadow-brand-light' 
-                            : 'bg-white shadow-lg shadow-brand-light'
-                        }`}
+                        className={`p-0 rounded-full overflow-hidden transition-all duration-300 bg-white shadow-md border border-brand-brown/10`}
                     >
                         <img src={mfpeLogo} alt="Mahaveer Food Products" className="w-12 h-12 object-cover rounded-full" />
                     </motion.div>
@@ -60,7 +57,7 @@ const Navbar = () => {
                         <span className={`text-xl font-black tracking-tight leading-none transition-colors duration-300 text-gray-900`}>
                             MAHAVEER<span className="text-brand-brown">FOOD</span>
                         </span>
-                        <span className={`text-[10px] font-bold tracking-[0.2em] uppercase transition-colors duration-300 text-gray-600`}>Premium Quality</span>
+                        <span className={`text-[10px] font-black tracking-[0.2em] uppercase transition-colors duration-300 text-gray-600`}>Premium Quality</span>
                     </div>
                 </Link>
 
@@ -72,7 +69,7 @@ const Navbar = () => {
                             to={link.path}
                             className="relative px-5 py-2 group"
                         >
-                            <span className={`text-sm font-bold transition-colors duration-300 ${
+                            <span className={`text-sm font-black transition-colors duration-300 ${
                                 location.pathname === link.path 
                                 ? 'text-brand-brown' 
                                 : 'text-gray-700 group-hover:text-gray-900'
@@ -91,20 +88,39 @@ const Navbar = () => {
 
                 {/* Action Buttons */}
                 <div className="flex items-center gap-2 sm:gap-4">
-                    <button className={`hidden sm:flex p-2.5 rounded-full transition-all duration-300 text-gray-700 hover:bg-brand-cream hover:text-gray-900`}>
+                    <button className="hidden sm:flex p-2.5 rounded-full transition-all duration-300 text-gray-700 hover:bg-brand-cream hover:text-gray-900">
                         <Search size={20} />
                     </button>
-                    <button className={`hidden sm:flex p-2.5 rounded-full transition-all duration-300 text-gray-700 hover:bg-brand-cream hover:text-gray-900`}>
-                        <Heart size={20} />
-                    </button>
                     
-                    <div className={`h-6 w-px hidden sm:block mx-1 bg-gray-300`}></div>
+                    <Link to="/wishlist" className="relative group">
+                        <motion.button 
+                            whileHover={{ scale: 1.05 }}
+                            whileTap={{ scale: 0.95 }}
+                            className="hidden sm:flex p-2.5 rounded-full transition-all duration-300 text-gray-700 hover:bg-brand-cream hover:text-brand-brown"
+                        >
+                            <Heart size={20} />
+                        </motion.button>
+                        <AnimatePresence>
+                            {wishlistCount > 0 && (
+                                <motion.span 
+                                    initial={{ scale: 0, opacity: 0 }}
+                                    animate={{ scale: 1, opacity: 1 }}
+                                    exit={{ scale: 0, opacity: 0 }}
+                                    className="absolute -top-1.5 -right-1.5 text-[11px] font-black rounded-full h-5 w-5 flex items-center justify-center border-2 shadow-md bg-brand-red text-white border-white"
+                                >
+                                    {wishlistCount}
+                                </motion.span>
+                            )}
+                        </AnimatePresence>
+                    </Link>
+                    
+                    <div className="h-6 w-px hidden sm:block mx-1 bg-gray-300"></div>
 
                     <Link to="/cart" className="relative group">
                         <motion.div 
                             whileHover={{ scale: 1.05 }}
                             whileTap={{ scale: 0.95 }}
-                            className={`p-3 rounded-2xl transition-all duration-500 bg-gray-900 text-white shadow-xl shadow-gray-900/30 hover:bg-gray-800`}
+                            className="p-3 rounded-2xl transition-all duration-500 bg-brand-cream text-brand-brown hover:bg-brand-light"
                         >
                             <ShoppingCart size={20} />
                         </motion.div>
@@ -114,7 +130,7 @@ const Navbar = () => {
                                     initial={{ scale: 0, opacity: 0 }}
                                     animate={{ scale: 1, opacity: 1 }}
                                     exit={{ scale: 0, opacity: 0 }}
-                                    className={`absolute -top-1.5 -right-1.5 text-[11px] font-black rounded-full h-5 w-5 flex items-center justify-center border-2 shadow-md bg-brand-red text-gray-900 border-brand-red`}
+                                    className="absolute -top-1.5 -right-1.5 text-[11px] font-black rounded-full h-5 w-5 flex items-center justify-center border-2 border-white bg-brand-red text-white"
                                 >
                                     {cartCount}
                                 </motion.span>
@@ -124,9 +140,7 @@ const Navbar = () => {
 
                     <button 
                         onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
-                        className={`lg:hidden p-2.5 rounded-2xl transition-all ${
-                            isScrolled ? 'bg-gray-100 text-gray-900' : 'bg-white/10 text-white backdrop-blur-md'
-                        }`}
+                        className="lg:hidden p-2.5 rounded-2xl bg-gray-100 text-gray-900"
                     >
                         {isMobileMenuOpen ? <X size={24} /> : <Menu size={24} />}
                     </button>
@@ -142,14 +156,14 @@ const Navbar = () => {
                             animate={{ opacity: 1 }}
                             exit={{ opacity: 0 }}
                             onClick={() => setIsMobileMenuOpen(false)}
-                            className="fixed inset-0 bg-black/20 backdrop-blur-sm z-[-1]"
+                            className="fixed inset-0 bg-black/20 backdrop-blur-sm z-[101]"
                         />
                         <motion.div
                             initial={{ x: '100%' }}
                             animate={{ x: 0 }}
                             exit={{ x: '100%' }}
                             transition={{ type: 'spring', damping: 25, stiffness: 200 }}
-                            className="fixed top-0 right-0 h-screen w-[280px] bg-white shadow-2xl z-[101] p-8 flex flex-col"
+                            className="fixed top-0 right-0 h-screen w-[280px] bg-white shadow-2xl z-[102] p-8 flex flex-col"
                         >
                             <div className="flex justify-between items-center mb-12">
                                 <span className="text-xl font-black text-gray-900">MENU</span>
@@ -168,7 +182,7 @@ const Navbar = () => {
                                         <Link 
                                             to={link.path}
                                             onClick={() => setIsMobileMenuOpen(false)}
-                                            className={`text-2xl font-bold hover:text-brand-brown transition-colors ${
+                                            className={`text-2xl font-black hover:text-brand-brown transition-colors ${
                                                 location.pathname === link.path ? 'text-brand-brown' : 'text-gray-900'
                                             }`}
                                         >
@@ -179,7 +193,7 @@ const Navbar = () => {
                             </div>
                             
                             <div className="mt-auto pt-8 border-t border-brand-brown/10">
-                                <button className="w-full bg-brand-brown text-white py-4 rounded-2xl font-bold shadow-lg shadow-brand-light flex items-center justify-center gap-2">
+                                <button className="w-full bg-brand-brown text-white py-4 rounded-2xl font-black shadow-lg flex items-center justify-center gap-2">
                                     <User size={20} /> Sign In
                                 </button>
                             </div>

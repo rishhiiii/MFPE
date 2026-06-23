@@ -44,7 +44,7 @@ const Cart = () => {
             });
 
             const options = {
-                key: "your_razorpay_key_id",
+                key: import.meta.env.VITE_RAZORPAY_KEY_ID || "your_razorpay_key_id", // Use env var if available
                 amount: order.amount,
                 currency: order.currency,
                 name: "Mahaveer Food Products",
@@ -61,13 +61,8 @@ const Cart = () => {
                         alert("Verification failed!");
                     }
                 },
-                prefill: {
-                    name: "Customer Name",
-                    email: "customer@example.com",
-                    contact: "9999999999"
-                },
                 theme: {
-                    color: "#8B0000"
+                    color: "#8B4513" // Your brand brown color
                 }
             };
 

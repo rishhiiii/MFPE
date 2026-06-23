@@ -1,167 +1,183 @@
 import React from 'react';
 import { motion } from 'framer-motion';
-import { Heart, Target, Users, Award, Globe, Leaf, ChevronRight } from 'lucide-react';
+import { CheckCircle, ArrowRight } from 'lucide-react';
 import { Link } from 'react-router-dom';
-import jaggery3 from '../assets/jaggery3.jpeg';
+import jaggeryNew4 from '../assets/jaggery new 4.jpeg';
+import jaggeryNew5 from '../assets/jaggery new 5.jpeg';
 
 const About = () => {
-    const coreValues = [
-        { icon: <Leaf className="w-8 h-8" />, title: "Integrity", desc: "We operate with honesty and transparency in every business relationship." },
-        { icon: <Award className="w-8 h-8" />, title: "Quality", desc: "Uncompromising standards ensure every product meets our premium specifications." },
-        { icon: <Heart className="w-8 h-8" />, title: "Sustainability", desc: "Committed to eco-friendly practices and sustainable sourcing." },
-        { icon: <Target className="w-8 h-8" />, title: "Innovation", desc: "Continuously improving our products and processes." },
-        { icon: <Users className="w-8 h-8" />, title: "Customer Satisfaction", desc: "Dedicated to exceeding customer expectations." },
-        { icon: <Globe className="w-8 h-8" />, title: "Continuous Growth", desc: "Expanding our reach and product portfolio consistently." }
-    ];
+  return (
+    <div className="pt-32 pb-24 bg-brand-cream min-h-screen">
+      <div className="max-w-full mx-auto px-6 sm:px-12 lg:px-20">
+        
+        {/* Page Header */}
+        <motion.div 
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          className="text-center mb-16"
+        >
+          <h1 className="text-4xl md:text-5xl font-medium text-gray-900 mb-4">
+            About <span className="text-brand-brown">Mahaveer Food Products</span>
+          </h1>
+          <p className="text-lg text-gray-600 max-w-2xl mx-auto">
+            Bringing you pure, natural, and authentic food products since 1994.
+          </p>
+        </motion.div>
 
-    return (
-        <div className="pt-32 pb-24 bg-brand-cream min-h-screen">
-            <div className="max-w-full mx-auto px-6 sm:px-12 lg:px-20">
-                {/* Hero Section */}
-                <div className="max-w-4xl mx-auto text-center mb-24">
-                    <motion.div
-                        initial={{ opacity: 0, y: 20 }}
-                        animate={{ opacity: 1, y: 0 }}
-                        className="inline-block bg-brand-red text-gray-900 px-6 py-3 rounded-full font-bold text-xs uppercase tracking-widest mb-6 shadow-lg shadow-brand-red/30"
-                    >
-                        About Us
-                    </motion.div>
-                    <motion.h1
-                        initial={{ opacity: 0, y: 20 }}
-                        animate={{ opacity: 1, y: 0 }}
-                        transition={{ delay: 0.1 }}
-                        className="text-5xl md:text-7xl font-heading font-black text-gray-900 tracking-tighter mb-8"
-                    >
-                        Our Story
-                    </motion.h1>
-                    <motion.p
-                        initial={{ opacity: 0, y: 20 }}
-                        animate={{ opacity: 1, y: 0 }}
-                        transition={{ delay: 0.2 }}
-                        className="font-body text-xl text-gray-700 leading-relaxed"
-                    >
-                        Mahaveer Food Products & Exporters was established with a vision to provide authentic, high-quality food products to customers across the globe.
-                    </motion.p>
+        {/* Our Story */}
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          viewport={{ once: true }}
+          className="max-w-4xl mx-auto bg-white rounded-3xl p-8 md:p-12 mb-16 border border-gray-100"
+        >
+          <p className="text-lg text-gray-700 leading-relaxed mb-6">
+            Since 1994, Mahaveer Food Products & Exporters has been committed to delivering pure, natural, and authentic food products prepared using traditional Jain methods.
+          </p>
+          
+          <p className="text-lg text-gray-700 leading-relaxed mb-6">
+            Our Premium Cane Jaggery is crafted from carefully selected sugarcane and processed with time-honored techniques that preserve its natural taste, color, and nutritional value. We believe that nature provides the best ingredients, which is why our products are made with a strong commitment to purity and quality.
+          </p>
+
+          <div className="mb-8">
+            <h3 className="text-2xl font-medium text-gray-900 mb-6">We proudly offer:</h3>
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              {[
+                "100% Organic & Natural",
+                "Chemical-Free Processing",
+                "No Harmful Additives or Preservatives",
+                "No Added Sugar",
+                "Naturally Rich Color & Taste",
+                "Traditional Jain Processing Methods",
+                "Rich in Essential Minerals & Nutrients"
+              ].map((item, i) => (
+                <div key={i} className="flex items-center gap-3">
+                  <CheckCircle className="w-6 h-6 text-brand-brown flex-shrink-0" />
+                  <span className="text-gray-700">{item}</span>
                 </div>
-
-                {/* Our Story Section */}
-                <div className="grid grid-cols-1 lg:grid-cols-2 gap-20 items-center mb-24">
-                    <motion.div
-                        initial={{ opacity: 0, x: -50 }}
-                        whileInView={{ opacity: 1, x: 0 }}
-                        viewport={{ once: true }}
-                        className="relative rounded-[3rem] overflow-hidden aspect-[4/5] shadow-2xl"
-                    >
-                        <img 
-                            src={jaggery3} 
-                            alt="Our Story" 
-                            className="w-full h-full object-cover"
-                        />
-                    </motion.div>
-
-                    <div className="space-y-8">
-                        <h2 className="text-4xl font-heading font-black text-gray-900 tracking-tight">Our Story</h2>
-                        <p className="font-body text-lg text-gray-700 leading-relaxed">
-                            Mahaveer Food Products & Exporters was established with a vision to provide authentic, high-quality food products to customers across the globe.
-                        </p>
-                        <p className="font-body text-lg text-gray-700 leading-relaxed">
-                            We work closely with farmers, suppliers, and manufacturing partners to ensure that every product meets the highest standards of quality and safety.
-                        </p>
-                        <p className="font-body text-lg text-gray-700 leading-relaxed">
-                            Our commitment to sustainability, ethical sourcing, and customer satisfaction drives everything we do.
-                        </p>
-                    </div>
-                </div>
-
-                {/* Mission & Vision */}
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-12 mb-24">
-                    <motion.div
-                        initial={{ opacity: 0, x: -30 }}
-                        whileInView={{ opacity: 1, x: 0 }}
-                        viewport={{ once: true }}
-                        className="p-10 rounded-[2.5rem] bg-gradient-to-br from-white to-brand-cream border-2 border-brand-brown/20 shadow-xl"
-                    >
-                        <div className="w-16 h-16 rounded-[1.5rem] bg-brand-red text-gray-900 flex items-center justify-center mb-8 shadow-lg shadow-brand-red/30">
-                            <Target className="w-8 h-8" />
-                        </div>
-                        <h3 className="text-3xl font-heading font-black text-gray-900 mb-4">Our Mission</h3>
-                        <p className="font-body text-lg text-gray-700 leading-relaxed">
-                            To deliver premium-quality organic and FMCG products while promoting healthy lifestyles, sustainable sourcing, and long-term customer relationships.
-                        </p>
-                    </motion.div>
-                    <motion.div
-                        initial={{ opacity: 0, x: 30 }}
-                        whileInView={{ opacity: 1, x: 0 }}
-                        viewport={{ once: true }}
-                        transition={{ delay: 0.1 }}
-                        className="p-10 rounded-[2.5rem] bg-gradient-to-br from-white to-brand-cream border-2 border-brand-brown/20 shadow-xl"
-                    >
-                        <div className="w-16 h-16 rounded-[1.5rem] bg-brand-red text-gray-900 flex items-center justify-center mb-8 shadow-lg shadow-brand-red/30">
-                            <Globe className="w-8 h-8" />
-                        </div>
-                        <h3 className="text-3xl font-heading font-black text-gray-900 mb-4">Our Vision</h3>
-                        <p className="font-body text-lg text-gray-700 leading-relaxed">
-                            To become a globally recognized brand known for quality, trust, innovation, and excellence in organic and FMCG products.
-                        </p>
-                    </motion.div>
-                </div>
-
-                {/* Core Values */}
-                <div className="mb-24">
-                    <div className="text-center mb-16">
-                        <h2 className="text-4xl md:text-5xl font-heading font-black text-gray-900 mb-4">
-                            Our Core Values
-                        </h2>
-                    </div>
-                    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-                        {coreValues.map((value, idx) => (
-                            <motion.div
-                                key={idx}
-                                initial={{ opacity: 0, y: 30 }}
-                                whileInView={{ opacity: 1, y: 0 }}
-                                viewport={{ once: true }}
-                                transition={{ delay: idx * 0.1 }}
-                                whileHover={{ y: -8 }}
-                                className="p-10 rounded-[2.5rem] bg-gradient-to-br from-white to-brand-cream border-2 border-brand-brown/20 hover:border-brand-brown hover:shadow-2xl hover:shadow-brand-brown/10 transition-all duration-500 group"
-                            >
-                                <div className="w-16 h-16 rounded-[1.5rem] bg-brand-red text-gray-900 flex items-center justify-center mb-6 shadow-lg shadow-brand-red/30 group-hover:scale-110 transition-transform duration-300">
-                                    {value.icon}
-                                </div>
-                                <h3 className="text-xl font-heading font-black text-gray-900 mb-3">{value.title}</h3>
-                                <p className="font-body text-gray-700 leading-relaxed">{value.desc}</p>
-                            </motion.div>
-                        ))}
-                    </div>
-                </div>
-
-                {/* CTA Section */}
-                <div className="text-center">
-                    <motion.div
-                        initial={{ opacity: 0, y: 30 }}
-                        whileInView={{ opacity: 1, y: 0 }}
-                        viewport={{ once: true }}
-                        className="bg-brand-light rounded-[2.5rem] p-12 md:p-16"
-                    >
-                        <h2 className="text-3xl md:text-4xl font-heading font-black text-gray-900 mb-4">
-                            Ready to Explore Our Products?
-                        </h2>
-                        <p className="font-body text-xl text-gray-700 mb-10 max-w-2xl mx-auto">
-                            Discover our full range of organic and FMCG products.
-                        </p>
-                        <Link to="/shop">
-                            <motion.button
-                                whileHover={{ scale: 1.05 }}
-                                whileTap={{ scale: 0.95 }}
-                                className="bg-gray-900 text-white px-10 py-4 rounded-[2rem] font-bold text-lg shadow-2xl transition-all flex items-center gap-3"
-                            >
-                                Browse Products <ChevronRight size={20} />
-                            </motion.button>
-                        </Link>
-                    </motion.div>
-                </div>
+              ))}
             </div>
-        </div>
-    );
+          </div>
+
+          <p className="text-lg text-gray-700 leading-relaxed mb-8">
+            For more than three decades, our mission has been to provide wholesome, healthy, and trustworthy food products that support a natural lifestyle. Every batch is carefully prepared and hygienically packed to ensure that the goodness of nature reaches your family exactly as intended.
+          </p>
+
+          <div className="text-center pt-6 border-t border-gray-100">
+            <p className="text-xl font-medium text-brand-brown italic">
+              "From Nature to Your Home, Pure Goodness Since 1994."
+            </p>
+          </div>
+        </motion.div>
+
+        {/* Manufacturing Process */}
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          viewport={{ once: true }}
+          className="mb-16"
+        >
+          <h2 className="text-3xl md:text-4xl font-medium text-gray-900 text-center mb-12">
+            Our <span className="text-brand-brown">Manufacturing Process</span>
+          </h2>
+          <div className="max-w-6xl mx-auto grid grid-cols-1 md:grid-cols-2 gap-6">
+            {[
+              { step: 1, title: "Selection of Premium Sugarcane", desc: "Fresh and carefully selected sugarcane is sourced from trusted farms to ensure superior quality and natural sweetness." },
+              { step: 2, title: "Juice Extraction", desc: "The sugarcane is thoroughly cleaned and crushed to extract fresh, nutrient-rich juice." },
+              { step: 3, title: "Natural Filtration", desc: "The extracted juice is filtered to remove impurities while maintaining its natural goodness." },
+              { step: 4, title: "Traditional Heating Process", desc: "The filtered juice is slowly heated in traditional pans under controlled temperatures to preserve its natural minerals, aroma, and flavor." },
+              { step: 5, title: "No Harmful Chemicals", desc: "No artificial chemicals, preservatives, bleaching agents, or synthetic colors are used during the manufacturing process." },
+              { step: 6, title: "Natural Concentration", desc: "As the juice thickens, it is continuously stirred by skilled workers until it reaches the perfect consistency." },
+              { step: 7, title: "Molding & Cooling", desc: "The concentrated jaggery is poured into molds and allowed to cool naturally, giving it its characteristic texture and shape." },
+              { step: 8, title: "Quality Inspection", desc: "Every batch undergoes strict quality checks to ensure purity, hygiene, consistency, and premium quality." },
+              { step: 9, title: "Hygienic Packaging", desc: "The finished product is carefully packed in food-grade packaging to preserve freshness and ensure safe delivery." },
+              { step: 10, title: "Ready for Your Family", desc: "The result is pure, natural, chemical-free Cane Jaggery with authentic taste, natural color, and wholesome nutrition." }
+            ].map((item, i) => (
+              <motion.div
+                key={i}
+                initial={{ opacity: 0, y: 20 }}
+                whileInView={{ opacity: 1, y: 0 }}
+                viewport={{ once: true }}
+                transition={{ delay: i * 0.03 }}
+                className="bg-white p-6 rounded-2xl border border-gray-100"
+              >
+                <div className="flex items-center gap-3 mb-3">
+                  <div className="w-10 h-10 rounded-full bg-brand-cream text-brand-brown flex items-center justify-center font-medium text-lg">
+                    {item.step}
+                  </div>
+                  <h4 className="text-lg font-medium text-gray-900">{item.title}</h4>
+                </div>
+                <p className="text-gray-600 text-sm">{item.desc}</p>
+              </motion.div>
+            ))}
+          </div>
+        </motion.div>
+
+        {/* Gallery */}
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          viewport={{ once: true }}
+          className="mb-16"
+        >
+          <h2 className="text-3xl md:text-4xl font-medium text-gray-900 text-center mb-12">
+            Our <span className="text-brand-brown">Gallery</span>
+          </h2>
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-6 max-w-5xl mx-auto">
+            <motion.div
+              initial={{ opacity: 0, x: -20 }}
+              whileInView={{ opacity: 1, x: 0 }}
+              viewport={{ once: true }}
+              className="rounded-2xl overflow-hidden border border-gray-100"
+            >
+              <img
+                src={jaggeryNew4}
+                alt="Our Products"
+                className="w-full h-80 object-cover"
+              />
+            </motion.div>
+            <motion.div
+              initial={{ opacity: 0, x: 20 }}
+              whileInView={{ opacity: 1, x: 0 }}
+              viewport={{ once: true }}
+              className="rounded-2xl overflow-hidden border border-gray-100"
+            >
+              <img
+                src={jaggeryNew5}
+                alt="Our Process"
+                className="w-full h-80 object-cover"
+              />
+            </motion.div>
+          </div>
+        </motion.div>
+
+        {/* CTA */}
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          viewport={{ once: true }}
+          className="text-center bg-brand-brown/10 rounded-3xl p-10 md:p-16 max-w-4xl mx-auto"
+        >
+          <h3 className="text-2xl md:text-3xl font-medium text-gray-900 mb-4">
+            Ready to try our pure products?
+          </h3>
+          <p className="text-gray-600 mb-8 max-w-2xl mx-auto">
+            Explore our collection of premium organic products.
+          </p>
+          <Link to="/shop">
+            <motion.button
+              whileHover={{ scale: 1.05 }}
+              whileTap={{ scale: 0.95 }}
+              className="bg-brand-brown text-white px-8 py-4 rounded-xl font-medium flex items-center gap-2 mx-auto"
+            >
+              Shop Now
+              <ArrowRight size={18} />
+            </motion.button>
+          </Link>
+        </motion.div>
+      </div>
+    </div>
+  );
 };
 
 export default About;
