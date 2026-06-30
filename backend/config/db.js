@@ -1,13 +1,19 @@
 const mongoose = require('mongoose');
 
+mongoose.set('bufferCommands', false);
+
+const isDbConnected = () => mongoose.connection.readyState === 1;
+
 const connectDB = async () => {
-    try {
-        const conn = await mongoose.connect(process.env.MONGO_URI);
-        console.log(`MongoDB Connected: ${conn.connection.host}`);
-    } catch (error) {
-        console.error(`Error: ${error.message}`);
-        // Do not exit, allow server to run for UI demo purposes
-    }
+  try {
+    const conn = await mongoose.connect(process.env.MONGO_URI, {
+      serverSelectionTimeoutMS: 5000,
+    });
+    console.log(`MongoDB Connected: ${conn.connection.host}`);
+  } catch (error) {
+    console.error(`MongoDB connection failed: ${error.message}`);
+    // Keep the API server available so the frontend can degrade gracefully.
+  }
 };
 
-module.exports = connectDB;
+module.exports = { connectDB, isDbConnected };

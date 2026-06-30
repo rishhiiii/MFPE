@@ -27,7 +27,11 @@ export const CartProvider = ({ children }) => {
         setCartItems(prev => {
             const existing = prev.find(item => item._id === product._id);
             if (existing) {
-                return prev.map(item => item._id === product._id ? { ...item, qty: item.qty + 1 } : item);
+                const newQty = product.qty === -1 ? existing.qty - 1 : existing.qty + (product.qty || 1);
+                if (newQty <= 0) {
+                    return prev.filter(item => item._id !== product._id);
+                }
+                return prev.map(item => item._id === product._id ? { ...item, qty: newQty } : item);
             }
             return [...prev, { ...product, qty: 1 }];
         });

@@ -43,39 +43,39 @@ const Shop = () => {
     }, [activeCategory, searchQuery, products]);
 
     return (
-        <div className="pt-32 pb-24 bg-brand-cream min-h-screen">
+        <div className="pt-28 pb-20 bg-brand-cream min-h-screen">
             <div className="max-w-full mx-auto px-6 sm:px-12 lg:px-20">
                 {/* Page Header */}
-                <div className="text-center mb-12 pt-12">
-                    <h1 className="text-5xl font-black text-gray-900 mb-4">
+                <div className="text-center mb-10 pt-4">
+                    <h1 className="text-3xl md:text-4xl font-bold text-gray-900 mb-3">
                         Our <span className="text-brand-brown">Collection</span>
                     </h1>
-                    <p className="text-lg text-gray-600 max-w-2xl mx-auto">
+                    <p className="text-base md:text-lg text-gray-600 max-w-2xl mx-auto">
                         Explore our premium selection of organic products
                     </p>
                 </div>
 
                 {/* Search Bar */}
-                <div className="max-w-2xl mx-auto mb-10">
+                <div className="max-w-xl mx-auto mb-8">
                     <div className="relative">
-                        <Search className="absolute left-6 top-1/2 -translate-y-1/2 text-gray-400" size={24} />
+                        <Search className="absolute left-5 top-1/2 -translate-y-1/2 text-gray-400" size={20} />
                         <input 
                             type="text" 
                             placeholder="Search products..."
                             value={searchQuery}
                             onChange={(e) => setSearchQuery(e.target.value)}
-                            className="w-full pl-16 pr-8 py-5 bg-white rounded-2xl border border-gray-200 focus:ring-2 focus:ring-brand-red outline-none font-medium"
+                            className="w-full pl-14 pr-6 py-4 bg-white rounded-xl border border-gray-200 focus:ring-2 focus:ring-brand-red outline-none font-medium"
                         />
                     </div>
                 </div>
 
                 {/* Categories */}
-                <div className="flex flex-wrap justify-center gap-4 mb-12">
+                <div className="flex flex-wrap justify-center gap-3 mb-10">
                     {categories.map(cat => (
                         <button
                             key={cat}
                             onClick={() => setActiveCategory(cat)}
-                            className={`px-8 py-3 rounded-full font-medium text-sm transition-all border-2 ${
+                            className={`px-6 py-2.5 rounded-full font-semibold text-xs md:text-sm transition-all border-2 ${
                                 activeCategory === cat 
                                 ? 'bg-brand-cream border-brand-cream text-brand-brown' 
                                 : 'bg-white border-gray-200 text-gray-600 hover:border-brand-brown hover:text-brand-brown'
@@ -88,18 +88,18 @@ const Shop = () => {
 
                 {/* Products Grid */}
                 {loading ? (
-                    <div className="flex justify-center items-center py-20">
+                    <div className="flex justify-center items-center py-16">
                         <div className="w-10 h-10 border-4 border-brand-light border-t-brand-red rounded-full animate-spin" />
                     </div>
                 ) : (
                     <>
                         {filteredProducts.length === 0 ? (
-                            <div className="text-center py-20">
-                                <h3 className="text-2xl font-black text-gray-900 mb-4">No products found</h3>
-                                <p className="text-gray-600">Try different keywords or categories</p>
+                            <div className="text-center py-16">
+                                <h3 className="text-xl font-bold text-gray-900 mb-3">No products found</h3>
+                                <p className="text-gray-600 text-sm">Try different keywords or categories</p>
                             </div>
                         ) : (
-                            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-8">
+                            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-5">
                                 {filteredProducts.map(product => (
                                     <ProductCard key={product._id} product={product} />
                                 ))}

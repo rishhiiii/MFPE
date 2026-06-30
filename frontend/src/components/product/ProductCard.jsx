@@ -5,7 +5,9 @@ import { useCart } from '../../context/CartContext';
 import jaggery1 from '../../assets/jaggery1.jpeg';
 
 const getProductImage = (imagePath) => {
-    return imagePath || jaggery1;
+    if (!imagePath) return jaggery1;
+    if (imagePath.startsWith('http')) return imagePath;
+    return `http://localhost:5000${imagePath}`;
 };
 
 const ProductCard = ({ product }) => {

@@ -1,51 +1,89 @@
-import React from 'react';
-import { Search, Bell, Moon, Settings } from 'lucide-react';
+import { Bell, CalendarDays, Search, Settings } from 'lucide-react';
 import { motion } from 'framer-motion';
+import { useLocation } from 'react-router-dom';
 
 const Header = () => {
-    return (
-        <header className="h-24 bg-white/80 backdrop-blur-xl border-b border-gray-100 flex items-center justify-between px-10 sticky top-0 z-40">
-            <div className="flex-grow max-w-xl">
-                <div className="relative group">
-                    <Search className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-400 group-focus-within:text-brand-red transition-colors" size={20} />
-                    <input 
-                        type="text" 
-                        placeholder="Quick search anything..."
-                        className="w-full pl-12 pr-6 py-3.5 bg-gray-50 border-none rounded-xl focus:ring-2 focus:ring-brand-red outline-none font-bold text-sm text-gray-900 transition-all"
-                    />
-                </div>
+  const location = useLocation();
+
+  const pageCopy = {
+    '/': {
+      title: 'Dashboard',
+      subtitle: 'Overview of sales, stock, and customer activity',
+    },
+    '/products': {
+      title: 'Products',
+      subtitle: 'Catalog management, pricing, and stock control',
+    },
+    '/orders': {
+      title: 'Orders',
+      subtitle: 'Payment visibility and operational follow-up',
+    },
+    '/customers': {
+      title: 'Customers',
+      subtitle: 'Registration insights and purchase activity',
+    },
+    '/settings': {
+      title: 'Settings',
+      subtitle: 'Admin preferences and backend connectivity',
+    },
+  };
+
+  const currentPage = pageCopy[location.pathname] || pageCopy['/'];
+
+  return (
+    <header className="sticky top-0 z-30 border-b border-slate-200/80 bg-white/85 px-6 py-4 backdrop-blur-xl lg:px-8">
+      <div className="flex flex-col gap-4 xl:flex-row xl:items-center xl:justify-between">
+        <div>
+          <p className="text-sm font-bold uppercase tracking-[0.2em] text-brand-red">
+            {currentPage.title}
+          </p>
+          <h2 className="mt-2 text-2xl font-black tracking-tight text-slate-900">
+            {currentPage.subtitle}
+          </h2>
+        </div>
+
+        <div className="flex flex-col gap-3 md:flex-row md:items-center">
+          <div className="relative min-w-[260px]">
+            <Search
+              className="pointer-events-none absolute left-4 top-1/2 -translate-y-1/2 text-slate-400"
+              size={18}
+            />
+            <input
+              type="text"
+              placeholder="Search the admin workspace"
+              className="w-full rounded-2xl border border-slate-200 bg-slate-50 py-3 pl-11 pr-4 text-sm font-semibold text-slate-900 outline-none transition focus:border-brand-red/40 focus:bg-white"
+            />
+          </div>
+
+          <div className="flex items-center gap-3">
+            <div className="hidden rounded-2xl border border-slate-200 bg-slate-50 px-4 py-3 md:flex md:items-center md:gap-2">
+              <CalendarDays size={17} className="text-slate-400" />
+              <span className="text-sm font-bold text-slate-700">
+                {new Intl.DateTimeFormat('en-IN', { dateStyle: 'medium' }).format(new Date())}
+              </span>
             </div>
 
-            <div className="flex items-center gap-4">
-                <motion.button 
-                    whileHover={{ scale: 1.05 }}
-                    whileTap={{ scale: 0.95 }}
-                    className="p-3 rounded-xl bg-gray-50 text-gray-500 hover:text-brand-red transition-colors relative"
-                >
-                    <Bell size={22} />
-                    <span className="absolute top-3 right-3 w-2.5 h-2.5 bg-brand-red border-2 border-white rounded-full" />
-                </motion.button>
-                
-                <motion.button 
-                    whileHover={{ scale: 1.05 }}
-                    whileTap={{ scale: 0.95 }}
-                    className="p-3 rounded-xl bg-gray-50 text-gray-500 hover:text-gray-900 transition-colors"
-                >
-                    <Moon size={22} />
-                </motion.button>
+            <motion.button
+              whileHover={{ scale: 1.03 }}
+              whileTap={{ scale: 0.97 }}
+              className="relative rounded-2xl border border-slate-200 bg-slate-50 p-3 text-slate-500 transition hover:border-brand-red/20 hover:text-brand-red"
+            >
+              <Bell size={20} />
+              <span className="absolute right-2 top-2 h-2.5 w-2.5 rounded-full bg-brand-red" />
+            </motion.button>
 
-                <div className="h-8 w-px bg-gray-100 mx-2" />
-
-                <motion.button 
-                    whileHover={{ scale: 1.05 }}
-                    whileTap={{ scale: 0.95 }}
-                    className="p-3 rounded-xl bg-gray-50 text-gray-500 hover:text-gray-900 transition-colors"
-                >
-                    <Settings size={22} />
-                </motion.button>
-            </div>
-        </header>
-    );
+            <motion.button
+              whileHover={{ scale: 1.03 }}
+              whileTap={{ scale: 0.97 }}
+              className="rounded-2xl border border-slate-200 bg-slate-50 p-3 text-slate-500 transition hover:border-brand-red/20 hover:text-brand-red"
+            >
+              <Settings size={20} />
+            </motion.button>
+          </div>
+        </div>
+      </div>
+    </header>
+  );
 };
 
 export default Header;

@@ -1,12 +1,14 @@
 import React, { useState, useEffect } from 'react';
 import { Link, useLocation } from 'react-router-dom';
-import { ShoppingCart, Menu, X, User, Search, Heart } from 'lucide-react';
+import { ShoppingCart, Menu, X, User, Heart, LogOut } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useCart } from '../../context/CartContext';
+import { useAuth } from '../../context/AuthContext';
 import mfpeLogo from '../../assets/mfpelogo.jpeg';
 
 const Navbar = () => {
     const { cartItems, wishlistItems } = useCart();
+    const { user, logout } = useAuth();
     const [isScrolled, setIsScrolled] = useState(false);
     const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
     const location = useLocation();
@@ -33,6 +35,20 @@ const Navbar = () => {
         { name: 'Contact', path: '/contact' },
     ];
 
+    const defaultNavText = isScrolled ? 'text-gray-700 hover:text-brand-brown' : 'text-brand-cream hover:text-white';
+    const defaultActionButton = isScrolled
+        ? 'bg-transparent text-gray-800 hover:bg-brand-cream hover:text-brand-brown'
+        : 'bg-black/30 backdrop-blur-md border border-white/20 text-brand-cream hover:bg-black/45 hover:text-white';
+    const loginTextClass = isScrolled
+        ? 'text-gray-800 hover:text-brand-brown'
+        : 'text-brand-cream hover:text-white';
+    const signupClass = isScrolled
+        ? 'px-4 py-2 text-sm font-semibold bg-brand-brown text-white rounded-xl hover:bg-brand-darkBrown transition-colors'
+        : 'px-4 py-2 text-sm font-semibold bg-brand-cream text-brand-brown rounded-xl hover:bg-white transition-colors shadow-sm';
+    const dividerClass = isScrolled ? 'bg-gray-300' : 'bg-white/25';
+    const brandNameClass = isScrolled ? 'text-gray-900' : 'text-brand-cream';
+    const brandTaglineClass = isScrolled ? 'text-gray-600' : 'text-brand-cream/80';
+
     return (
         <motion.nav 
             initial={{ y: -100 }}
@@ -54,10 +70,12 @@ const Navbar = () => {
                         <img src={mfpeLogo} alt="Mahaveer Food Products" className="w-12 h-12 object-cover rounded-full" />
                     </motion.div>
                     <div className="flex flex-col">
-                        <span className={`text-xl font-black tracking-tight leading-none transition-colors duration-300 text-gray-900`}>
-                            MAHAVEER<span className="text-brand-brown">FOOD</span>
+                        <span className={`text-lg sm:text-xl font-black text-white tracking-tight leading-none transition-colors duration-300 ${brandNameClass}`}>
+                            MAHAVEER <span className="text-white">FOOD</span>
                         </span>
-                        <span className={`text-[10px] font-black tracking-[0.2em] uppercase transition-colors duration-300 text-gray-600`}>Premium Quality</span>
+                        <span className={`text-[9px] sm:text-[10px] font-black tracking-[0.16em] uppercase text-gray-400 transition-colors duration-300 ${brandTaglineClass}`}>
+                            Products And Exporters
+                        </span>
                     </div>
                 </Link>
 
@@ -72,7 +90,7 @@ const Navbar = () => {
                             <span className={`text-sm font-black transition-colors duration-300 ${
                                 location.pathname === link.path 
                                 ? 'text-brand-brown' 
-                                : 'text-gray-700 group-hover:text-gray-900'
+                                : defaultNavText
                             }`}>
                                 {link.name}
                             </span>
@@ -88,15 +106,11 @@ const Navbar = () => {
 
                 {/* Action Buttons */}
                 <div className="flex items-center gap-2 sm:gap-4">
-                    <button className="hidden sm:flex p-2.5 rounded-full transition-all duration-300 text-gray-700 hover:bg-brand-cream hover:text-gray-900">
-                        <Search size={20} />
-                    </button>
-                    
                     <Link to="/wishlist" className="relative group">
                         <motion.button 
                             whileHover={{ scale: 1.05 }}
                             whileTap={{ scale: 0.95 }}
-                            className="hidden sm:flex p-2.5 rounded-full transition-all duration-300 text-gray-700 hover:bg-brand-cream hover:text-brand-brown"
+                            className={`hidden sm:flex p-2.5 rounded-full transition-all duration-300 ${defaultActionButton}`}
                         >
                             <Heart size={20} />
                         </motion.button>
@@ -114,13 +128,17 @@ const Navbar = () => {
                         </AnimatePresence>
                     </Link>
                     
-                    <div className="h-6 w-px hidden sm:block mx-1 bg-gray-300"></div>
+                    <div className={`h-6 w-px hidden sm:block mx-1 ${dividerClass}`}></div>
 
                     <Link to="/cart" className="relative group">
                         <motion.div 
                             whileHover={{ scale: 1.05 }}
                             whileTap={{ scale: 0.95 }}
-                            className="p-3 rounded-2xl transition-all duration-500 bg-brand-cream text-brand-brown hover:bg-brand-light"
+                            className={`p-3 rounded-2xl transition-all duration-500 ${
+                                isScrolled
+                                    ? 'bg-brand-cream text-brand-brown hover:bg-brand-light'
+                                    : 'bg-brand-cream/95 text-brand-brown shadow-md hover:bg-white'
+                            }`}
                         >
                             <ShoppingCart size={20} />
                         </motion.div>
@@ -137,6 +155,34 @@ const Navbar = () => {
                             )}
                         </AnimatePresence>
                     </Link>
+
+                    {/* Auth Buttons */}
+                    {user ? (
+                        <div className="hidden sm:flex items-center gap-3">
+                            <span className={`text-sm font-semibold ${loginTextClass}`}>Hi, {user.name.split(' ')[0]}</span>
+                            <button
+                                onClick={logout}
+                                className={`p-2.5 rounded-full transition-all duration-300 ${defaultActionButton}`}
+                            >
+                                <LogOut size={20} />
+                            </button>
+                        </div>
+                    ) : (
+                        <div className="hidden sm:flex items-center gap-2">
+                            <Link
+                                to="/login"
+                                className={`px-4 py-2 text-sm font-semibold transition-colors ${loginTextClass}`}
+                            >
+                                Login
+                            </Link>
+                            <Link
+                                to="/signup"
+                                className={signupClass}
+                            >
+                                Sign Up
+                            </Link>
+                        </div>
+                    )}
 
                     <button 
                         onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
@@ -193,9 +239,37 @@ const Navbar = () => {
                             </div>
                             
                             <div className="mt-auto pt-8 border-t border-brand-brown/10">
-                                <button className="w-full bg-brand-brown text-white py-4 rounded-2xl font-black shadow-lg flex items-center justify-center gap-2">
-                                    <User size={20} /> Sign In
-                                </button>
+                                {user ? (
+                                    <div className="space-y-4">
+                                        <p className="text-center text-lg font-semibold text-gray-700">Hi, {user.name}</p>
+                                        <button
+                                            onClick={() => {
+                                                logout();
+                                                setIsMobileMenuOpen(false);
+                                            }}
+                                            className="w-full bg-gray-100 text-gray-900 py-4 rounded-2xl font-black flex items-center justify-center gap-2"
+                                        >
+                                            <LogOut size={20} /> Logout
+                                        </button>
+                                    </div>
+                                ) : (
+                                    <div className="space-y-3">
+                                        <Link
+                                            to="/login"
+                                            onClick={() => setIsMobileMenuOpen(false)}
+                                            className="w-full bg-white text-gray-900 border border-gray-300 py-4 rounded-2xl font-black flex items-center justify-center gap-2"
+                                        >
+                                            <User size={20} /> Login
+                                        </Link>
+                                        <Link
+                                            to="/signup"
+                                            onClick={() => setIsMobileMenuOpen(false)}
+                                            className="w-full bg-brand-brown text-white py-4 rounded-2xl font-black flex items-center justify-center gap-2"
+                                        >
+                                            <User size={20} /> Sign Up
+                                        </Link>
+                                    </div>
+                                )}
                             </div>
                         </motion.div>
                     </>

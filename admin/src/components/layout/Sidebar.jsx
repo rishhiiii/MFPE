@@ -1,88 +1,108 @@
-import React from 'react';
 import { Link, useLocation } from 'react-router-dom';
-import { 
-    LayoutDashboard, 
-    Package, 
-    ShoppingCart, 
-    Users, 
-    Settings, 
-    LogOut, 
-    Bell,
-    ChevronRight
+import {
+  ChevronRight,
+  LayoutDashboard,
+  LogOut,
+  Package,
+  Settings,
+  ShoppingCart,
+  Users,
 } from 'lucide-react';
 import { motion } from 'framer-motion';
 import mfpeLogo from '../../assets/mfpelogo.jpeg';
 
 const Sidebar = () => {
-    const location = useLocation();
+  const location = useLocation();
 
-    const menuItems = [
-        { name: 'Dashboard', icon: <LayoutDashboard size={22} />, path: '/' },
-        { name: 'Products', icon: <Package size={22} />, path: '/products' },
-        { name: 'Orders', icon: <ShoppingCart size={22} />, path: '/orders' },
-        { name: 'Customers', icon: <Users size={22} />, path: '/customers' },
-        { name: 'Store Settings', icon: <Settings size={22} />, path: '/settings' },
-    ];
+  const menuItems = [
+    { name: 'Dashboard', icon: <LayoutDashboard size={20} />, path: '/' },
+    { name: 'Products', icon: <Package size={20} />, path: '/products' },
+    { name: 'Orders', icon: <ShoppingCart size={20} />, path: '/orders' },
+    { name: 'Customers', icon: <Users size={20} />, path: '/customers' },
+    { name: 'Settings', icon: <Settings size={20} />, path: '/settings' },
+  ];
 
-    return (
-        <div className="w-72 h-screen bg-gray-900 text-white flex flex-col fixed left-0 top-0 z-50 shadow-2xl">
-            {/* Logo */}
-            <div className="p-8">
-                <Link to="/" className="flex items-center gap-3 group">
-                    <div className="p-0 rounded-full overflow-hidden shadow-lg shadow-red-900/20 group-hover:scale-110 transition-transform">
-                        <img src={mfpeLogo} alt="Mahaveer Food" className="w-12 h-12 object-cover rounded-full" />
-                    </div>
-                    <div className="flex flex-col">
-                        <span className="text-xl font-black tracking-tight leading-none">ADMIN<span className="text-brand-red">PRO</span></span>
-                        <span className="text-[10px] font-bold text-gray-500 uppercase tracking-widest mt-1">Mahaveer Food</span>
-                    </div>
-                </Link>
+  return (
+    <aside className="hidden h-screen w-72 flex-col border-r border-slate-200 bg-white lg:fixed lg:left-0 lg:top-0 lg:flex">
+      <div className="border-b border-slate-100 p-8">
+        <Link to="/" className="flex items-center gap-3 group">
+          <div className="overflow-hidden rounded-full shadow-lg shadow-brand-red/10 transition-transform group-hover:scale-105">
+            <img
+              src={mfpeLogo}
+              alt="Mahaveer Food"
+              className="h-12 w-12 rounded-full object-cover"
+            />
+          </div>
+          <div className="flex flex-col">
+            <span className="text-xl font-black leading-none tracking-tight text-slate-900">
+              Admin<span className="text-brand-red">Hub</span>
+            </span>
+            <span className="mt-1 text-[10px] font-bold uppercase tracking-[0.25em] text-slate-400">
+              Mahaveer Food
+            </span>
+          </div>
+        </Link>
+      </div>
+
+      <nav className="flex-grow space-y-2 px-4 py-6">
+        {menuItems.map((item) => {
+          const isActive = location.pathname === item.path;
+
+          return (
+            <Link
+              key={item.name}
+              to={item.path}
+              className={`group flex items-center justify-between rounded-2xl px-4 py-3.5 transition ${
+                isActive
+                  ? 'border border-brand-red/10 bg-brand-cream text-slate-900 shadow-sm'
+                  : 'text-slate-500 hover:bg-slate-50 hover:text-slate-900'
+              }`}
+            >
+              <div className="flex items-center gap-3">
+                <span
+                  className={`rounded-2xl p-2 transition ${
+                    isActive
+                      ? 'bg-white text-brand-red shadow-sm'
+                      : 'bg-slate-100 text-slate-500 group-hover:text-brand-red'
+                  }`}
+                >
+                  {item.icon}
+                </span>
+                <span className="text-sm font-black">{item.name}</span>
+              </div>
+              {isActive ? (
+                <motion.div layoutId="sidebarIndicator" className="text-brand-red">
+                  <ChevronRight size={16} />
+                </motion.div>
+              ) : null}
+            </Link>
+          );
+        })}
+      </nav>
+
+      <div className="mt-auto border-t border-slate-100 p-6">
+        <div className="rounded-3xl border border-slate-200 bg-slate-50 p-4">
+          <div className="flex items-center gap-4">
+            <div className="flex h-11 w-11 items-center justify-center rounded-2xl bg-brand-cream font-black text-brand-red">
+              AD
             </div>
-
-            {/* Nav Links */}
-            <nav className="flex-grow px-4 space-y-2">
-                {menuItems.map((item) => (
-                    <Link 
-                        key={item.name} 
-                        to={item.path}
-                        className={`group flex items-center justify-between px-5 py-4 rounded-2xl transition-all duration-300 ${
-                            location.pathname === item.path 
-                            ? 'bg-brand-red text-white shadow-lg shadow-red-900/20' 
-                            : 'text-gray-400 hover:bg-white/5 hover:text-white'
-                        }`}
-                    >
-                        <div className="flex items-center gap-4">
-                            <span className={`${location.pathname === item.path ? 'text-white' : 'text-gray-500 group-hover:text-brand-red'} transition-colors`}>
-                                {item.icon}
-                            </span>
-                            <span className="font-bold text-sm">{item.name}</span>
-                        </div>
-                        {location.pathname === item.path && (
-                            <motion.div layoutId="sidebarDot">
-                                <ChevronRight size={16} />
-                            </motion.div>
-                        )}
-                    </Link>
-                ))}
-            </nav>
-
-            {/* User Info */}
-            <div className="p-6 mt-auto border-t border-white/5">
-                <div className="bg-white/5 p-4 rounded-2xl flex items-center gap-4 mb-4">
-                    <div className="w-10 h-10 rounded-xl bg-gradient-to-tr from-brand-red to-brand-red flex items-center justify-center font-black text-white">
-                        AD
-                    </div>
-                    <div className="flex-grow">
-                        <p className="text-sm font-black truncate">Admin User</p>
-                        <p className="text-[10px] font-bold text-gray-500 uppercase tracking-wider">Super Admin</p>
-                    </div>
-                    <button className="text-gray-500 hover:text-brand-red transition-colors">
-                        <LogOut size={18} />
-                    </button>
-                </div>
+            <div className="flex-grow">
+              <p className="truncate text-sm font-black text-slate-900">Admin User</p>
+              <p className="mt-1 text-[10px] font-bold uppercase tracking-[0.22em] text-slate-400">
+                Store operations
+              </p>
             </div>
+            <button
+              type="button"
+              className="rounded-2xl p-2 text-slate-500 transition hover:bg-white hover:text-brand-red"
+            >
+              <LogOut size={18} />
+            </button>
+          </div>
         </div>
-    );
+      </div>
+    </aside>
+  );
 };
 
 export default Sidebar;
