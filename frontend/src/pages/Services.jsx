@@ -1,12 +1,11 @@
 import React from 'react';
 import { motion } from 'framer-motion';
-import { Truck, ShieldCheck, RefreshCcw, Package, CreditCard, Headphones, Globe, Zap } from 'lucide-react';
+import { Truck, ShieldCheck, Package, CreditCard, Headphones, Globe, Zap } from 'lucide-react';
 
 const Services = () => {
     const services = [
         { icon: <Truck size={24} />, title: "Pan-India Delivery", desc: "We deliver our products to every corner of India within 3-5 business days." },
         { icon: <ShieldCheck size={24} />, title: "Quality Assurance", desc: "Every batch undergoes rigorous quality checks to ensure 100% purity and hygiene." },
-        { icon: <RefreshCcw size={24} />, title: "Easy Returns", desc: "Not satisfied? We offer a hassle-free 7-day return policy for all our products." },
         { icon: <Package size={24} />, title: "Bulk Ordering", desc: "Special rates for bulk orders, events, and corporate gifting solutions." },
         { icon: <CreditCard size={24} />, title: "Secure Payments", desc: "Multiple secure payment options including UPI, Cards, and Net Banking." },
         { icon: <Headphones size={24} />, title: "24/7 Support", desc: "Our dedicated support team is always here to help you with your queries." },

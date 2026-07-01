@@ -35,16 +35,16 @@ const Navbar = () => {
         { name: 'Contact', path: '/contact' },
     ];
 
-    const defaultNavText = isScrolled ? 'text-gray-700 hover:text-brand-brown' : 'text-brand-cream hover:text-white';
+    const defaultNavText = isScrolled ? 'text-gray-700 hover:text-brand-brown' : 'text-brand-cream hover:text-brand-brown';
     const defaultActionButton = isScrolled
         ? 'bg-transparent text-gray-800 hover:bg-brand-cream hover:text-brand-brown'
-        : 'bg-black/30 backdrop-blur-md border border-white/20 text-brand-cream hover:bg-black/45 hover:text-white';
+        : 'bg-black/30 backdrop-blur-md border border-white/20 text-brand-cream hover:bg-black/45 hover:text-brand-brown';
     const loginTextClass = isScrolled
         ? 'text-gray-800 hover:text-brand-brown'
-        : 'text-brand-cream hover:text-white';
+        : 'text-brand-cream hover:text-brand-brown';
     const signupClass = isScrolled
         ? 'px-4 py-2 text-sm font-semibold bg-brand-brown text-white rounded-xl hover:bg-brand-darkBrown transition-colors'
-        : 'px-4 py-2 text-sm font-semibold bg-brand-cream text-brand-brown rounded-xl hover:bg-white transition-colors shadow-sm';
+        : 'px-4 py-2 text-sm font-semibold bg-brand-cream text-brand-brown rounded-xl hover:bg-brand-light transition-colors shadow-sm';
     const dividerClass = isScrolled ? 'bg-gray-300' : 'bg-white/25';
     const brandNameClass = isScrolled ? 'text-gray-900' : 'text-brand-cream';
     const brandTaglineClass = isScrolled ? 'text-gray-600' : 'text-brand-cream/80';
@@ -158,7 +158,7 @@ const Navbar = () => {
 
                     {/* Auth Buttons */}
                     {user ? (
-                        <div className="hidden sm:flex items-center gap-3">
+                        <div className="flex items-center gap-3">
                             <span className={`text-sm font-semibold ${loginTextClass}`}>Hi, {user.name.split(' ')[0]}</span>
                             <button
                                 onClick={logout}
@@ -168,7 +168,7 @@ const Navbar = () => {
                             </button>
                         </div>
                     ) : (
-                        <div className="hidden sm:flex items-center gap-2">
+                        <div className="flex items-center gap-2">
                             <Link
                                 to="/login"
                                 className={`px-4 py-2 text-sm font-semibold transition-colors ${loginTextClass}`}

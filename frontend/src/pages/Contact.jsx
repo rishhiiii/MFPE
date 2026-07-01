@@ -1,9 +1,41 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { motion } from 'framer-motion';
-import { Mail, Phone, MapPin, Send, Clock, ArrowRight } from 'lucide-react';
+import { Mail, Phone, MapPin, Send, Clock, ArrowRight, CheckCircle2 } from 'lucide-react';
 import { Link } from 'react-router-dom';
+import api from '../lib/api';
 
 const Contact = () => {
+  const [formData, setFormData] = useState({
+    name: '',
+    company: '',
+    email: '',
+    phone: '',
+    message: ''
+  });
+  const [isSending, setIsSending] = useState(false);
+  const [isSuccess, setIsSuccess] = useState(false);
+
+  const handleChange = (e) => {
+    setFormData({ ...formData, [e.target.name]: e.target.value });
+  };
+
+  const handleSubmit = (e) => {
+    e.preventDefault();
+    setIsSending(true);
+
+    api.post('/api/contact', formData)
+      .then(() => {
+        setIsSuccess(true);
+        setFormData({ name: '', company: '', email: '', phone: '', message: '' });
+        setTimeout(() => setIsSuccess(false), 5000);
+      })
+      .catch((error) => {
+        console.error(error);
+        alert('Failed to send message. Please try again.');
+      })
+      .finally(() => setIsSending(false));
+  };
+
   return (
     <div className="pt-32 pb-24 bg-brand-cream min-h-screen">
       <div className="max-w-full mx-auto px-6 sm:px-12 lg:px-20">
@@ -54,6 +86,16 @@ const Contact = () => {
 
                 <div className="flex gap-4 items-start p-4 bg-brand-cream/50 rounded-2xl border border-gray-100">
                   <div className="w-12 h-12 rounded-xl bg-brand-cream flex items-center justify-center shrink-0 text-brand-brown">
+                    <MapPin className="w-6 h-6" />
+                  </div>
+                  <div>
+                    <h4 className="text-sm text-gray-500 uppercase tracking-wider mb-1">Address</h4>
+                    <p className="text-lg font-medium text-gray-900">H.No. 4, Patrakar Colony, Link Road No. 3, Bhopal, Madhya Pradesh 462003</p>
+                  </div>
+                </div>
+
+                <div className="flex gap-4 items-start p-4 bg-brand-cream/50 rounded-2xl border border-gray-100">
+                  <div className="w-12 h-12 rounded-xl bg-brand-cream flex items-center justify-center shrink-0 text-brand-brown">
                     <Clock className="w-6 h-6" />
                   </div>
                   <div>
@@ -79,61 +121,94 @@ const Contact = () => {
             className="bg-white rounded-3xl p-8 md:p-10 border border-gray-100"
           >
             <h2 className="text-2xl font-medium text-gray-900 mb-6">Send an Inquiry</h2>
-            <form className="space-y-4" onSubmit={(e) => e.preventDefault()}>
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                <div className="space-y-1">
-                  <label className="text-xs text-gray-500 uppercase tracking-wider">Full Name</label>
-                  <input 
-                    type="text" 
-                    placeholder="Your Name"
-                    className="w-full px-4 py-3 bg-gray-50 border border-gray-200 rounded-xl focus:ring-2 focus:ring-brand-brown focus:border-brand-brown outline-none text-gray-900 transition-all"
-                  />
-                </div>
-                <div className="space-y-1">
-                  <label className="text-xs text-gray-500 uppercase tracking-wider">Company Name</label>
-                  <input 
-                    type="text" 
-                    placeholder="Company Name"
-                    className="w-full px-4 py-3 bg-gray-50 border border-gray-200 rounded-xl focus:ring-2 focus:ring-brand-brown focus:border-brand-brown outline-none text-gray-900 transition-all"
-                  />
-                </div>
-              </div>
-
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                <div className="space-y-1">
-                  <label className="text-xs text-gray-500 uppercase tracking-wider">Email</label>
-                  <input 
-                    type="email" 
-                    placeholder="your@email.com"
-                    className="w-full px-4 py-3 bg-gray-50 border border-gray-200 rounded-xl focus:ring-2 focus:ring-brand-brown focus:border-brand-brown outline-none text-gray-900 transition-all"
-                  />
-                </div>
-                <div className="space-y-1">
-                  <label className="text-xs text-gray-500 uppercase tracking-wider">Phone</label>
-                  <input 
-                    type="tel" 
-                    placeholder="+91 9669993888"
-                    className="w-full px-4 py-3 bg-gray-50 border border-gray-200 rounded-xl focus:ring-2 focus:ring-brand-brown focus:border-brand-brown outline-none text-gray-900 transition-all"
-                  />
-                </div>
-              </div>
-
-              <div className="space-y-1">
-                <label className="text-xs text-gray-500 uppercase tracking-wider">Message</label>
-                <textarea 
-                  placeholder="Tell us more about your requirements..."
-                  className="w-full px-4 py-3 bg-gray-50 border border-gray-200 rounded-xl focus:ring-2 focus:ring-brand-brown focus:border-brand-brown outline-none text-gray-900 h-32 resize-none transition-all"
-                />
-              </div>
-
-              <motion.button
-                whileHover={{ scale: 1.02 }}
-                whileTap={{ scale: 0.98 }}
-                className="w-full bg-brand-brown text-white px-8 py-4 rounded-xl font-medium flex items-center justify-center gap-2 hover:bg-brand-darkBrown transition-all"
+            
+            {isSuccess ? (
+              <motion.div 
+                initial={{ opacity: 0, scale: 0.95 }}
+                animate={{ opacity: 1, scale: 1 }}
+                className="bg-green-50 border border-green-200 rounded-2xl p-6 text-center"
               >
-                Submit <Send className="w-5 h-5" />
-              </motion.button>
-            </form>
+                <CheckCircle2 size={48} className="mx-auto mb-4 text-green-600" />
+                <h3 className="text-xl font-bold text-gray-900 mb-2">Message Sent!</h3>
+                <p className="text-gray-600">Thank you for reaching out. We'll get back to you soon.</p>
+              </motion.div>
+            ) : (
+              <form className="space-y-4" onSubmit={handleSubmit}>
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  <div className="space-y-1">
+                    <label className="text-xs text-gray-500 uppercase tracking-wider">Full Name</label>
+                    <input 
+                      type="text" 
+                      name="name"
+                      value={formData.name}
+                      onChange={handleChange}
+                      placeholder="Your Name"
+                      required
+                      className="w-full px-4 py-3 bg-gray-50 border border-gray-200 rounded-xl focus:ring-2 focus:ring-brand-brown focus:border-brand-brown outline-none text-gray-900 transition-all"
+                    />
+                  </div>
+                  <div className="space-y-1">
+                    <label className="text-xs text-gray-500 uppercase tracking-wider">Company Name</label>
+                    <input 
+                      type="text" 
+                      name="company"
+                      value={formData.company}
+                      onChange={handleChange}
+                      placeholder="Company Name"
+                      className="w-full px-4 py-3 bg-gray-50 border border-gray-200 rounded-xl focus:ring-2 focus:ring-brand-brown focus:border-brand-brown outline-none text-gray-900 transition-all"
+                    />
+                  </div>
+                </div>
+
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  <div className="space-y-1">
+                    <label className="text-xs text-gray-500 uppercase tracking-wider">Email</label>
+                    <input 
+                      type="email" 
+                      name="email"
+                      value={formData.email}
+                      onChange={handleChange}
+                      placeholder="your@email.com"
+                      required
+                      className="w-full px-4 py-3 bg-gray-50 border border-gray-200 rounded-xl focus:ring-2 focus:ring-brand-brown focus:border-brand-brown outline-none text-gray-900 transition-all"
+                    />
+                  </div>
+                  <div className="space-y-1">
+                    <label className="text-xs text-gray-500 uppercase tracking-wider">Phone</label>
+                    <input 
+                      type="tel" 
+                      name="phone"
+                      value={formData.phone}
+                      onChange={handleChange}
+                      placeholder="+91 9669993888"
+                      className="w-full px-4 py-3 bg-gray-50 border border-gray-200 rounded-xl focus:ring-2 focus:ring-brand-brown focus:border-brand-brown outline-none text-gray-900 transition-all"
+                    />
+                  </div>
+                </div>
+
+                <div className="space-y-1">
+                  <label className="text-xs text-gray-500 uppercase tracking-wider">Message</label>
+                  <textarea 
+                    name="message"
+                    value={formData.message}
+                    onChange={handleChange}
+                    placeholder="Tell us more about your requirements..."
+                    required
+                    className="w-full px-4 py-3 bg-gray-50 border border-gray-200 rounded-xl focus:ring-2 focus:ring-brand-brown focus:border-brand-brown outline-none text-gray-900 h-32 resize-none transition-all"
+                  />
+                </div>
+
+                <motion.button
+                  whileHover={{ scale: 1.02 }}
+                  whileTap={{ scale: 0.98 }}
+                  type="submit"
+                  disabled={isSending}
+                  className="w-full bg-brand-brown text-white px-8 py-4 rounded-xl font-medium flex items-center justify-center gap-2 hover:bg-brand-darkBrown transition-all disabled:opacity-70"
+                >
+                  {isSending ? 'Sending...' : 'Submit'} <Send className="w-5 h-5" />
+                </motion.button>
+              </form>
+            )}
           </motion.div>
         </div>
 

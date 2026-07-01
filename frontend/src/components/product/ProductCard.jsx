@@ -1,13 +1,15 @@
 import React from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Heart, ShoppingCart } from 'lucide-react';
+import { Heart, ShoppingCart, CheckCircle2 } from 'lucide-react';
 import { useCart } from '../../context/CartContext';
 import jaggery1 from '../../assets/jaggery1.jpeg';
+import { API_BASE_URL } from '../../lib/api';
 
 const getProductImage = (imagePath) => {
     if (!imagePath) return jaggery1;
     if (imagePath.startsWith('http')) return imagePath;
-    return `http://localhost:5000${imagePath}`;
+    if (imagePath.startsWith('/uploads')) return `${API_BASE_URL}${imagePath}`;
+    return imagePath;
 };
 
 const ProductCard = ({ product }) => {
@@ -18,7 +20,7 @@ const ProductCard = ({ product }) => {
 
     const handleAddToCart = (e) => {
         e.stopPropagation();
-        addToCart(product);
+        addToCart({ ...product, qty: 1 });
     };
 
     const handleToggleWishlist = (e) => {
@@ -31,44 +33,80 @@ const ProductCard = ({ product }) => {
     };
 
     return (
-        <div className="group cursor-pointer">
-            <div 
-                className="relative aspect-[4/5] overflow-hidden rounded-2xl bg-white border border-gray-100"
-                onClick={() => navigate(`/product/${product._id}`)}
-            >
+        <div 
+            className="group cursor-pointer bg-white rounded-2xl border border-gray-100 shadow-sm hover:shadow-xl transition-all duration-300 overflow-hidden flex flex-col h-full"
+            onClick={() => navigate(`/product/${product._id}`)}
+        >
+            {/* Product Image Section */}
+            <div className="relative aspect-[4/3] bg-gray-50 overflow-hidden">
                 <img 
                     src={getProductImage(product.image)} 
                     alt={product.name} 
-                    className="h-full w-full object-cover transition-transform duration-500 group-hover:scale-105"
+                    className="h-full w-full object-cover transition-transform duration-700 group-hover:scale-110"
                 />
                 
                 {/* Wishlist Button */}
                 <button
                     onClick={handleToggleWishlist}
-                    className="absolute top-4 right-4 bg-white p-2 rounded-full transition-all hover:bg-gray-50"
+                    className="absolute top-3 right-3 bg-white/90 backdrop-blur-sm p-2 rounded-full shadow-sm transition-all hover:bg-white hover:shadow-md hover:scale-110"
                 >
                     <Heart 
-                        size={20} 
+                        size={18} 
                         fill={isInWishlist ? "currentColor" : "none"}
-                        className={isInWishlist ? "text-brand-red" : "text-gray-400 hover:text-brand-red"}
+                        className={isInWishlist ? "text-red-500" : "text-gray-500 hover:text-red-500"}
                     />
                 </button>
 
-                {/* Add to Cart Button */}
-                <div className="absolute bottom-4 left-4 right-4 translate-y-full opacity-0 group-hover:translate-y-0 group-hover:opacity-100 transition-all duration-300">
-                    <button 
-                        onClick={handleAddToCart}
-                        className="w-full bg-brand-cream text-brand-brown py-3 rounded-xl font-medium flex items-center justify-center gap-2 hover:bg-brand-light transition-all"
-                    >
-                        <ShoppingCart size={18} />
-                        Add to Cart
-                    </button>
-                </div>
+                {/* Stock Badge */}
+                {product.stock > 0 ? (
+                    <div className="absolute top-3 left-3 bg-green-100 text-green-700 px-2 py-1 rounded-full text-xs font-bold">
+                        In Stock
+                    </div>
+                ) : (
+                    <div className="absolute top-3 left-3 bg-red-100 text-red-700 px-2 py-1 rounded-full text-xs font-bold">
+                        Sold Out
+                    </div>
+                )}
             </div>
 
-            <div className="mt-4">
-                <h3 className="text-lg font-medium text-gray-900 mb-2">{product.name}</h3>
-                <p className="text-xl font-black text-brand-brown">₹{product.price}</p>
+            {/* Product Info Section */}
+            <div className="flex-1 p-4 flex flex-col">
+                {/* Category */}
+                <div className="mb-2">
+                    <span className="text-[10px] font-bold text-brand-brown/60 uppercase tracking-widest">
+                        {product.category}
+                    </span>
+                </div>
+
+                {/* Product Name */}
+                <h3 className="text-base font-bold text-gray-900 line-clamp-2 leading-snug group-hover:text-brand-brown transition-colors mb-3">
+                    {product.name}
+                </h3>
+
+                {/* Feature */}
+                <div className="flex items-center gap-1 mb-4">
+                    <div className="flex items-center gap-1 bg-brand-cream/60 px-2 py-1 rounded-lg">
+                        <CheckCircle2 size={12} className="text-brand-brown" />
+                        <span className="text-[10px] font-bold text-gray-700">100% Pure</span>
+                    </div>
+                </div>
+
+                {/* Price & Add to Cart */}
+                <div className="mt-auto flex items-center justify-between pt-3 border-t border-gray-100">
+                    <div className="flex items-baseline gap-2">
+                        <span className="text-2xl font-black text-brand-brown">₹{Number(product.price).toFixed(2)}</span>
+                        <span className="text-sm text-gray-400 line-through font-bold">₹{Math.round(product.price * 1.3).toFixed(2)}</span>
+                    </div>
+                    
+                    <button 
+                        onClick={handleAddToCart}
+                        className="bg-brand-brown text-white px-4 py-2.5 rounded-xl text-sm font-bold flex items-center gap-2 hover:bg-brand-darkBrown transition-all duration-300 shadow-sm hover:shadow-md active:scale-95"
+                        disabled={product.stock <= 0}
+                    >
+                        <ShoppingCart size={16} />
+                        {product.stock > 0 ? 'Add' : 'Sold'}
+                    </button>
+                </div>
             </div>
         </div>
     );

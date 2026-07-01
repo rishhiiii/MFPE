@@ -25,10 +25,16 @@ const initialFormState = {
   price: '',
   stock: '',
   image: '',
+  ingredients: '',
+  shelfLife: '',
+  weight: '',
+  storage: '',
+  origin: '',
+  packaging: '',
 };
 
 const getFullImageUrl = (imagePath) => {
-  if (!imagePath) return '';
+  if (!imagePath) return 'https://via.placeholder.com/400x300?text=Product+Image';
   if (imagePath.startsWith('http')) return imagePath;
   const baseUrl = getApiBaseUrl().replace('/api', '');
   return `${baseUrl}${imagePath}`;
@@ -126,6 +132,12 @@ const Products = () => {
       price: product.price ?? '',
       stock: product.stock ?? '',
       image: product.image || '',
+      ingredients: product.ingredients || '',
+      shelfLife: product.shelfLife || '',
+      weight: product.weight || '',
+      storage: product.storage || '',
+      origin: product.origin || '',
+      packaging: product.packaging || '',
     });
     setSelectedFile(null);
     setImagePreview(product.image ? getFullImageUrl(product.image) : null);
@@ -172,6 +184,12 @@ const Products = () => {
       form.append('category', formData.category);
       form.append('price', String(formData.price));
       form.append('stock', String(formData.stock));
+      form.append('ingredients', formData.ingredients);
+      form.append('shelfLife', formData.shelfLife);
+      form.append('weight', formData.weight);
+      form.append('storage', formData.storage);
+      form.append('origin', formData.origin);
+      form.append('packaging', formData.packaging);
       
       if (selectedFile) {
         form.append('image', selectedFile);
@@ -564,6 +582,70 @@ const Products = () => {
                       placeholder="https://example.com/product-image.jpg"
                     />
                   </label>
+
+                  {/* Product Specifications */}
+                  <div className="grid gap-5 md:grid-cols-2">
+                    <label className="space-y-2">
+                      <span className="text-sm font-bold text-slate-700">Ingredients</span>
+                      <input
+                        name="ingredients"
+                        value={formData.ingredients}
+                        onChange={handleInputChange}
+                        className="w-full rounded-2xl border border-slate-200 bg-slate-50 px-4 py-3 text-sm font-semibold text-slate-900 outline-none transition focus:border-brand-red/40 focus:bg-white"
+                        placeholder="100% Organic Sugarcane / Lentils"
+                      />
+                    </label>
+                    <label className="space-y-2">
+                      <span className="text-sm font-bold text-slate-700">Shelf Life</span>
+                      <input
+                        name="shelfLife"
+                        value={formData.shelfLife}
+                        onChange={handleInputChange}
+                        className="w-full rounded-2xl border border-slate-200 bg-slate-50 px-4 py-3 text-sm font-semibold text-slate-900 outline-none transition focus:border-brand-red/40 focus:bg-white"
+                        placeholder="6 Months from Packing"
+                      />
+                    </label>
+                    <label className="space-y-2">
+                      <span className="text-sm font-bold text-slate-700">Weight</span>
+                      <input
+                        name="weight"
+                        value={formData.weight}
+                        onChange={handleInputChange}
+                        className="w-full rounded-2xl border border-slate-200 bg-slate-50 px-4 py-3 text-sm font-semibold text-slate-900 outline-none transition focus:border-brand-red/40 focus:bg-white"
+                        placeholder="500g / 1kg Variants"
+                      />
+                    </label>
+                    <label className="space-y-2">
+                      <span className="text-sm font-bold text-slate-700">Storage</span>
+                      <input
+                        name="storage"
+                        value={formData.storage}
+                        onChange={handleInputChange}
+                        className="w-full rounded-2xl border border-slate-200 bg-slate-50 px-4 py-3 text-sm font-semibold text-slate-900 outline-none transition focus:border-brand-red/40 focus:bg-white"
+                        placeholder="Store in a cool, dry place"
+                      />
+                    </label>
+                    <label className="space-y-2">
+                      <span className="text-sm font-bold text-slate-700">Origin</span>
+                      <input
+                        name="origin"
+                        value={formData.origin}
+                        onChange={handleInputChange}
+                        className="w-full rounded-2xl border border-slate-200 bg-slate-50 px-4 py-3 text-sm font-semibold text-slate-900 outline-none transition focus:border-brand-red/40 focus:bg-white"
+                        placeholder="Gujarat, India"
+                      />
+                    </label>
+                    <label className="space-y-2">
+                      <span className="text-sm font-bold text-slate-700">Packaging</span>
+                      <input
+                        name="packaging"
+                        value={formData.packaging}
+                        onChange={handleInputChange}
+                        className="w-full rounded-2xl border border-slate-200 bg-slate-50 px-4 py-3 text-sm font-semibold text-slate-900 outline-none transition focus:border-brand-red/40 focus:bg-white"
+                        placeholder="Eco-friendly Recyclable Bag"
+                      />
+                    </label>
+                  </div>
 
                   <div className="flex flex-col gap-3 border-t border-slate-100 pt-5 sm:flex-row sm:justify-end">
                     <button

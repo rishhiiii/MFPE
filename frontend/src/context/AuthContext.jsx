@@ -1,5 +1,5 @@
 import React, { createContext, useState, useEffect, useContext } from 'react';
-import axios from 'axios';
+import api from '../lib/api';
 import { auth, googleProvider, hasFirebaseConfig } from '../lib/firebase';
 import { signInWithPopup } from 'firebase/auth';
 
@@ -34,8 +34,8 @@ export const AuthProvider = ({ children }) => {
           'Content-Type': 'application/json',
         },
       };
-      const { data } = await axios.post(
-        'http://localhost:5000/api/auth/register',
+      const { data } = await api.post(
+        '/api/auth/register',
         { name, email, password, phone },
         config
       );
@@ -58,8 +58,8 @@ export const AuthProvider = ({ children }) => {
           'Content-Type': 'application/json',
         },
       };
-      const { data } = await axios.post(
-        'http://localhost:5000/api/auth/login',
+      const { data } = await api.post(
+        '/api/auth/login',
         { email, password },
         config
       );
@@ -121,8 +121,8 @@ export const AuthProvider = ({ children }) => {
           Authorization: `Bearer ${user.token}`,
         },
       };
-      const { data } = await axios.put(
-        'http://localhost:5000/api/auth/me',
+      const { data } = await api.put(
+        '/api/auth/me',
         userData,
         config
       );

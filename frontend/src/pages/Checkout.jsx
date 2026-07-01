@@ -1,21 +1,20 @@
 import React, { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
-import { CreditCard, ShoppingBag, ArrowLeft, CheckCircle2 } from 'lucide-react';
+import { CreditCard, ShoppingBag, ArrowLeft, CheckCircle2, Info } from 'lucide-react';
 import { useCart } from '../context/CartContext';
 import { useAuth } from '../context/AuthContext';
 import { Link, useNavigate } from 'react-router-dom';
-import axios from 'axios';
+import api, { API_BASE_URL } from '../lib/api';
+import { TEST_MODE } from '../lib/testMode';
 import jaggery1 from '../assets/jaggery1.jpeg';
 import jaggery2 from '../assets/jaggery2.jpeg';
 import jaggery3 from '../assets/jaggery3.jpeg';
 
 const getProductImage = (imagePath) => {
-    const imageMap = {
-        '/src/assets/jaggery1.jpeg': jaggery1,
-        '/src/assets/jaggery2.jpeg': jaggery2,
-        '/src/assets/jaggery3.jpeg': jaggery3
-    };
-    return imageMap[imagePath] || imagePath || 'https://via.placeholder.com/400';
+    if (!imagePath) return jaggery1;
+    if (imagePath.startsWith('http')) return imagePath;
+    if (imagePath.startsWith('/uploads')) return `${API_BASE_URL}${imagePath}`;
+    return imagePath;
 };
 
 const Checkout = () => {
@@ -69,7 +68,10 @@ const Checkout = () => {
 
     const handlePayment = async (e) => {
         e.preventDefault();
-        
+
+        // In test mode there is no backend, so skip the real payment flow entirely.
+        if (TEST_MODE) return;
+
         // Validate cart total
         if (totalPrice < 1) {
             alert('Minimum order amount is ₹1');
@@ -96,7 +98,7 @@ const Checkout = () => {
 
         try {
             console.log('Creating Razorpay order with amount:', totalPrice);
-            const { data: order } = await axios.post('http://localhost:5000/api/payment/order', {
+            const { data: order } = await api.post('/api/payment/order', {
                 amount: totalPrice
             });
             console.log('Razorpay order created:', order);
@@ -131,7 +133,7 @@ const Checkout = () => {
                             product: item._id
                         }));
 
-                        const verifyRes = await axios.post('http://localhost:5000/api/payment/verify', {
+                        const verifyRes = await api.post('/api/payment/verify', {
                             ...response,
                             shippingAddress: formData,
                             orderItems,
@@ -325,14 +327,32 @@ const Checkout = () => {
                                     />
                                 </div>
 
-                                <button 
-                                    type="submit"
-                                    disabled={isProcessing}
-                                    className="w-full bg-brand-brown text-white py-4 rounded-xl font-bold text-lg flex items-center justify-center gap-2 hover:bg-brand-darkBrown transition-all shadow-lg shadow-brand-light disabled:opacity-50"
-                                >
-                                    <CreditCard size={20} /> 
-                                    {isProcessing ? 'Processing...' : `Pay ₹${totalPrice}`}
-                                </button>
+                                {TEST_MODE ? (
+                                    <div className="space-y-4">
+                                        <div className="flex items-start gap-3 p-4 bg-amber-50 border border-amber-200 rounded-xl">
+                                            <Info size={20} className="text-amber-600 flex-shrink-0 mt-0.5" />
+                                            <p className="text-sm text-amber-800">
+                                                <span className="font-semibold">Online payments are launching soon.</span> Our store is currently in preview mode — you can browse products and build your cart, and secure online checkout will be enabled shortly. To place an order in the meantime, please reach us via the <Link to="/contact" className="font-semibold underline">Contact</Link> page.
+                                            </p>
+                                        </div>
+                                        <button
+                                            type="button"
+                                            disabled
+                                            className="w-full bg-brand-brown text-white py-4 rounded-xl font-bold text-lg flex items-center justify-center gap-2 opacity-60 cursor-not-allowed"
+                                        >
+                                            <CreditCard size={20} /> Payments Coming Soon
+                                        </button>
+                                    </div>
+                                ) : (
+                                    <button
+                                        type="submit"
+                                        disabled={isProcessing}
+                                        className="w-full bg-brand-brown text-white py-4 rounded-xl font-bold text-lg flex items-center justify-center gap-2 hover:bg-brand-darkBrown transition-all shadow-lg shadow-brand-light disabled:opacity-50"
+                                    >
+                                        <CreditCard size={20} />
+                                        {isProcessing ? 'Processing...' : `Pay ₹${Number(totalPrice).toFixed(2)}`}
+                                    </button>
+                                )}
                             </form>
                         </motion.div>
                     </div>
@@ -356,29 +376,29 @@ const Checkout = () => {
                                             className="w-14 h-14 rounded-xl object-cover"
                                         />
                                         <div className="flex-grow">
-                                            <p className="font-bold text-sm">{item.name}</p>
-                                            <p className="text-gray-400 text-xs">Qty: {item.qty}</p>
+                                            <p className="font-bold text-sm text-white">{item.name}</p>
+                                            <p className="text-brand-cream text-xs opacity-80">Qty: {item.qty}</p>
                                         </div>
-                                        <p className="font-bold">₹{item.price * item.qty}</p>
+                                        <p className="font-bold text-brand-cream">₹{Number(item.price * item.qty).toFixed(2)}</p>
                                     </div>
                                 ))}
                             </div>
                             
-                            <div className="border-t border-white/10 pt-5 mb-6 relative z-10">
-                                <div className="flex justify-between text-gray-400 font-semibold text-sm mb-2">
+                            <div className="border-t border-white/20 pt-5 mb-6 relative z-10">
+                                <div className="flex justify-between text-brand-cream font-semibold text-sm mb-2">
                                     <span>Subtotal</span>
-                                    <span className="text-white">₹{totalPrice}</span>
+                                    <span className="text-white">₹{Number(totalPrice).toFixed(2)}</span>
                                 </div>
-                                <div className="flex justify-between text-gray-400 font-semibold text-sm mb-2">
+                                <div className="flex justify-between text-brand-cream font-semibold text-sm mb-2">
                                     <span>Shipping</span>
-                                    <span className="text-brand-red font-bold uppercase tracking-widest text-[10px]">Free</span>
+                                    <span className="text-white font-bold uppercase tracking-widest text-[10px]">Free</span>
                                 </div>
                             </div>
                             
-                            <div className="border-t border-white/10 pt-5 relative z-10">
+                            <div className="border-t border-white/20 pt-5 relative z-10">
                                 <div className="flex justify-between items-end">
-                                    <span className="text-gray-400 font-semibold text-sm">Grand Total</span>
-                                    <span className="text-3xl font-bold text-brand-red">₹{totalPrice}</span>
+                                    <span className="text-brand-cream font-semibold text-sm">Grand Total</span>
+                                    <span className="text-3xl font-black text-brand-cream">₹{Number(totalPrice).toFixed(2)}</span>
                                 </div>
                             </div>
                         </motion.div>

@@ -1,7 +1,10 @@
 import React, { useState, useEffect } from 'react';
-import axios from 'axios';
+import api from '../lib/api';
+import { TEST_MODE } from '../lib/testMode';
+import dummyProducts from '../data/dummyProducts';
 import { motion } from 'framer-motion';
 import { Search } from 'lucide-react';
+import { useSearchParams } from 'react-router-dom';
 import ProductCard from '../components/product/ProductCard';
 
 const Shop = () => {
@@ -10,13 +13,27 @@ const Shop = () => {
     const [loading, setLoading] = useState(true);
     const [activeCategory, setActiveCategory] = useState('All');
     const [searchQuery, setSearchQuery] = useState('');
+    const [searchParams] = useSearchParams();
 
     const categories = ['All', 'Superfoods', 'Spices', 'Natural Sweeteners', 'Pulses & Grains', 'Dry Fruits', 'FMCG Products'];
 
     useEffect(() => {
+        const categoryFromUrl = searchParams.get('category');
+        if (categoryFromUrl && categories.includes(categoryFromUrl)) {
+            setActiveCategory(categoryFromUrl);
+        }
+    }, [searchParams]);
+
+    useEffect(() => {
         const fetchProducts = async () => {
+            if (TEST_MODE) {
+                setProducts(dummyProducts);
+                setFilteredProducts(dummyProducts);
+                setLoading(false);
+                return;
+            }
             try {
-                const { data } = await axios.get('http://localhost:5000/api/products');
+                const { data } = await api.get('/api/products');
                 setProducts(data);
                 setFilteredProducts(data);
             } catch (error) {

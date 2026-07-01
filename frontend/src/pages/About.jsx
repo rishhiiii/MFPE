@@ -2,8 +2,12 @@ import React from 'react';
 import { motion } from 'framer-motion';
 import { CheckCircle, ArrowRight } from 'lucide-react';
 import { Link } from 'react-router-dom';
+import jaggeryNew1 from '../assets/jaggery new 1.jpeg';
+import jaggeryNew2 from '../assets/jaggery new 2.jpeg';
+import jaggeryNew3 from '../assets/jaggery new 3.jpeg';
 import jaggeryNew4 from '../assets/jaggery new 4.jpeg';
 import jaggeryNew5 from '../assets/jaggery new 5.jpeg';
+import jaggeryNew6 from '../assets/jaggery new 6.jpeg';
 
 const About = () => {
   return (
@@ -123,11 +127,50 @@ const About = () => {
           <h2 className="text-3xl md:text-4xl font-medium text-gray-900 text-center mb-12">
             Our <span className="text-brand-brown">Gallery</span>
           </h2>
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-6 max-w-5xl mx-auto">
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-6 max-w-6xl mx-auto">
             <motion.div
               initial={{ opacity: 0, x: -20 }}
               whileInView={{ opacity: 1, x: 0 }}
               viewport={{ once: true }}
+              className="rounded-2xl overflow-hidden border border-gray-100"
+            >
+              <img
+                src={jaggeryNew1}
+                alt="Our Products"
+                className="w-full h-80 object-cover"
+              />
+            </motion.div>
+            <motion.div
+              initial={{ opacity: 0, y: 20 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: true }}
+              transition={{ delay: 0.1 }}
+              className="rounded-2xl overflow-hidden border border-gray-100"
+            >
+              <img
+                src={jaggeryNew2}
+                alt="Our Process"
+                className="w-full h-80 object-cover"
+              />
+            </motion.div>
+            <motion.div
+              initial={{ opacity: 0, x: 20 }}
+              whileInView={{ opacity: 1, x: 0 }}
+              viewport={{ once: true }}
+              transition={{ delay: 0.2 }}
+              className="rounded-2xl overflow-hidden border border-gray-100"
+            >
+              <img
+                src={jaggeryNew3}
+                alt="Our Quality"
+                className="w-full h-80 object-cover"
+              />
+            </motion.div>
+            <motion.div
+              initial={{ opacity: 0, x: -20 }}
+              whileInView={{ opacity: 1, x: 0 }}
+              viewport={{ once: true }}
+              transition={{ delay: 0.3 }}
               className="rounded-2xl overflow-hidden border border-gray-100"
             >
               <img
@@ -137,14 +180,28 @@ const About = () => {
               />
             </motion.div>
             <motion.div
-              initial={{ opacity: 0, x: 20 }}
-              whileInView={{ opacity: 1, x: 0 }}
+              initial={{ opacity: 0, y: 20 }}
+              whileInView={{ opacity: 1, y: 0 }}
               viewport={{ once: true }}
+              transition={{ delay: 0.4 }}
               className="rounded-2xl overflow-hidden border border-gray-100"
             >
               <img
                 src={jaggeryNew5}
                 alt="Our Process"
+                className="w-full h-80 object-cover"
+              />
+            </motion.div>
+            <motion.div
+              initial={{ opacity: 0, x: 20 }}
+              whileInView={{ opacity: 1, x: 0 }}
+              viewport={{ once: true }}
+              transition={{ delay: 0.5 }}
+              className="rounded-2xl overflow-hidden border border-gray-100"
+            >
+              <img
+                src={jaggeryNew6}
+                alt="Our Quality"
                 className="w-full h-80 object-cover"
               />
             </motion.div>

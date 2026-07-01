@@ -52,7 +52,7 @@ const Signup = () => {
   };
 
   return (
-    <div className="min-h-screen flex items-center py-16">
+    <div className="min-h-screen flex items-center py-32 pt-40">
       {/* Background Image */}
       <div className="fixed inset-0 -z-10">
         <img

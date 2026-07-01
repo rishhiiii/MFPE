@@ -4,10 +4,12 @@ import { Phone, Mail, MapPin, Share2, Globe, MessageCircle } from 'lucide-react'
 import mfpeLogo from '../../assets/mfpelogo.jpeg';
 
 const Footer = () => {
+    const categories = ['Superfoods', 'Spices', 'Natural Sweeteners', 'Pulses & Grains', 'Dry Fruits', 'FMCG Products'];
+
     return (
-        <footer className="bg-gradient-to-br from-brand-light to-brand-cream text-gray-900 pt-24 pb-12 rounded-t-[4rem] mx-4 mt-20 border-t border-brand-brown/10">
+        <footer className="bg-white text-gray-900 pt-24 pb-12 rounded-t-[4rem] mx-4 mt-20 border-t border-brand-brown/10 shadow-lg">
             <div className="container mx-auto px-4">
-                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-12 mb-20">
+                <div className="grid grid-cols-1 md:grid-cols-4 gap-12 mb-20">
                     {/* Brand Section */}
                     <div className="space-y-6">
                         <Link to="/" className="flex items-center gap-2 text-2xl font-black tracking-tighter">
@@ -60,14 +62,17 @@ const Footer = () => {
 
                     {/* Categories */}
                     <div>
-                        <h3 className="text-xl  font-bold mb-8 text-gray-900">Categories</h3>
+                        <h3 className="text-xl font-bold mb-8 text-gray-900">Categories</h3>
                         <ul className="space-y-4 text-gray-700 font-body font-medium">
-                            {['Organic Superfoods', 'Spices & Seasonings', 'Natural Sweeteners', 'Pulses & Grains', 'Dry Fruits & Nuts', 'FMCG Products'].map((link) => (
-                                <li key={link}>
-                                    <a href="#" className="hover:text-brand-brown transition-colors flex items-center gap-2">
+                            {categories.map((cat) => (
+                                <li key={cat}>
+                                    <Link 
+                                        to={`/shop?category=${encodeURIComponent(cat)}`} 
+                                        className="hover:text-brand-brown transition-colors flex items-center gap-2"
+                                    >
                                         <div className="w-1.5 h-1.5 bg-brand-brown rounded-full" />
-                                        {link}
-                                    </a>
+                                        {cat}
+                                    </Link>
                                 </li>
                             ))}
                         </ul>
@@ -81,7 +86,7 @@ const Footer = () => {
                                 <div className="bg-brand-brown/10 p-2.5 rounded-xl text-brand-brown">
                                     <MapPin size={20} />
                                 </div>
-                                <span>India</span>
+                                <span>H.No. 4, Patrakar Colony, Link Road No. 3, Bhopal, Madhya Pradesh 462003</span>
                             </li>
                             <li className="flex items-center gap-4">
                                 <div className="bg-brand-brown/10 p-2.5 rounded-xl text-brand-brown">
@@ -101,10 +106,11 @@ const Footer = () => {
 
                 <div className="pt-12 border-t border-brand-brown/20 flex flex-col md:flex-row justify-between items-center gap-6 text-gray-600 font-body font-medium">
                     <p>© 2026 Mahaveer Food Products & Exporters. All rights reserved.</p>
-                    <div className="flex gap-8">
-                        <a href="#" className="hover:text-brand-brown transition-colors">Privacy Policy</a>
-                        <a href="#" className="hover:text-brand-brown transition-colors">Terms of Service</a>
-                        <a href="#" className="hover:text-brand-brown transition-colors">Refund Policy</a>
+                    <div className="flex flex-wrap justify-center gap-x-8 gap-y-3">
+                        <Link to="/privacy-policy" className="hover:text-brand-brown transition-colors">Privacy Policy</Link>
+                        <Link to="/terms-and-conditions" className="hover:text-brand-brown transition-colors">Terms & Conditions</Link>
+                        <Link to="/refund-policy" className="hover:text-brand-brown transition-colors">Refund Policy</Link>
+                        <Link to="/shipping-policy" className="hover:text-brand-brown transition-colors">Shipping Policy</Link>
                     </div>
                 </div>
             </div>

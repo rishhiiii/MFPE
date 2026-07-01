@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useRef } from 'react';
-import axios from 'axios';
+import api, { API_BASE_URL } from '../lib/api';
 import { motion } from 'framer-motion';
 import { ArrowRight, Quote, ChevronLeft, ChevronRight, CheckCircle2, Leaf, Building2, Globe } from 'lucide-react';
 import Hero from '../components/home/Hero';
@@ -9,23 +9,26 @@ import { Link } from 'react-router-dom';
 import jaggery2 from '../assets/jaggery2.jpeg';
 import jaggery1 from '../assets/jaggery1.jpeg';
 import jaggery3 from '../assets/jaggery3.jpeg';
+import jaggeryNew1 from '../assets/jaggery new 1.jpeg';
 import jaggeryNew2 from '../assets/jaggery new 2.jpeg';
 import jaggeryNew3 from '../assets/jaggery new 3.jpeg';
 import jaggeryNew4 from '../assets/jaggery new 4.jpeg';
 import jaggeryNew5 from '../assets/jaggery new 5.jpeg';
 import jaggeryNew6 from '../assets/jaggery new 6.jpeg';
 import jaggeryNew7 from '../assets/jaggery new 7.jpeg';
+import { TEST_MODE } from '../lib/testMode';
+import dummyProducts from '../data/dummyProducts';
 
 const getProductImage = (imagePath) => {
     if (!imagePath) return jaggery1;
     if (imagePath.startsWith('http')) return imagePath;
-    if (imagePath.startsWith('/uploads')) return `http://localhost:5000${imagePath}`;
+    if (imagePath.startsWith('/uploads')) return `${API_BASE_URL}${imagePath}`;
     const imageMap = {
         '/src/assets/jaggery1.jpeg': jaggery1,
         '/src/assets/jaggery2.jpeg': jaggery2,
         '/src/assets/jaggery3.jpeg': jaggery3
     };
-    return imageMap[imagePath] || jaggery1;
+    return imageMap[imagePath] || imagePath;
 };
 
 const Home = () => {
@@ -36,8 +39,13 @@ const Home = () => {
 
     useEffect(() => {
         const fetchProducts = async () => {
+            if (TEST_MODE) {
+                setBestSellers(dummyProducts.slice(0, 4));
+                setLoading(false);
+                return;
+            }
             try {
-                const { data } = await axios.get('http://localhost:5000/api/products');
+                const { data } = await api.get('/api/products');
                 setBestSellers(data.slice(0, 4));
             } catch (error) {
                 console.error("Error fetching products", error);
@@ -74,7 +82,7 @@ const Home = () => {
                         >
                             <div className="rounded-2xl overflow-hidden border-4 border-white">
                                 <img 
-                                    src={jaggeryNew3} 
+                                    src={jaggeryNew6} 
                                     alt="Premium Cane Jaggery" 
                                     className="w-full h-full object-cover"
                                 />
@@ -139,9 +147,9 @@ const Home = () => {
                         >
                             <div className="rounded-2xl overflow-hidden aspect-square">
                                 <img 
-                                    src={jaggeryNew3} 
+                                    src={jaggery1} 
                                     alt="Mahaveer Food Products" 
-                                    className="w-full h-full object-cover"
+                                    className="w-full h-full object-cover object-center"
                                 />
                             </div>
                         </motion.div>
@@ -275,12 +283,12 @@ const Home = () => {
                                 </div>
                                 <div className="relative">
                                     <div className="aspect-[4/3] rounded-2xl overflow-hidden border-4 border-white">
-                                        <img 
-                                            src={[jaggeryNew4, jaggeryNew5, jaggeryNew6, jaggeryNew7, jaggeryNew4, jaggeryNew5][currentCategoryIndex]} 
-                                            alt={productCategories[currentCategoryIndex].title}
-                                            className="w-full h-full object-cover"
-                                        />
-                                    </div>
+                                    <img 
+                                        src={[jaggeryNew3, jaggeryNew4, jaggeryNew5, jaggeryNew6, jaggeryNew7, jaggeryNew2][currentCategoryIndex]} 
+                                        alt={productCategories[currentCategoryIndex].title}
+                                        className="w-full h-full object-cover"
+                                    />
+                                </div>
                                 </div>
                             </div>
                         </motion.div>

@@ -42,7 +42,7 @@ const Login = () => {
   };
 
   return (
-    <div className="min-h-screen flex items-center">
+    <div className="min-h-screen flex items-center pt-40">
       {/* Background Image */}
       <div className="fixed inset-0 -z-10">
         <img

@@ -6,14 +6,13 @@ import { Link } from 'react-router-dom';
 import jaggery1 from '../assets/jaggery1.jpeg';
 import jaggery2 from '../assets/jaggery2.jpeg';
 import jaggery3 from '../assets/jaggery3.jpeg';
+import { API_BASE_URL } from '../lib/api';
 
 const getProductImage = (imagePath) => {
-    const imageMap = {
-        '/src/assets/jaggery1.jpeg': jaggery1,
-        '/src/assets/jaggery2.jpeg': jaggery2,
-        '/src/assets/jaggery3.jpeg': jaggery3
-    };
-    return imageMap[imagePath] || imagePath || 'https://via.placeholder.com/400';
+    if (!imagePath) return jaggery1;
+    if (imagePath.startsWith('http')) return imagePath;
+    if (imagePath.startsWith('/uploads')) return `${API_BASE_URL}${imagePath}`;
+    return imagePath;
 };
 
 const Cart = () => {
@@ -65,7 +64,7 @@ const Cart = () => {
                                         <div className="flex-grow text-center sm:text-left">
                                             <p className="text-brand-brown text-[10px] font-bold uppercase tracking-widest mb-1">{item.category}</p>
                                             <h3 className="text-lg font-semibold text-gray-900 mb-1.5">{item.name}</h3>
-                                            <p className="text-xl font-bold text-gray-900">₹{item.price}</p>
+                                            <p className="text-xl font-bold text-gray-900">₹{Number(item.price).toFixed(2)}</p>
                                         </div>
 
                                         <div className="flex items-center gap-5">
@@ -91,7 +90,7 @@ const Cart = () => {
                                             
                                             <div className="text-right min-w-[80px]">
                                                 <p className="text-gray-400 text-xs mb-0.5">Total</p>
-                                                <p className="text-lg font-bold text-brand-brown">₹{item.price * item.qty}</p>
+                                                <p className="text-lg font-bold text-brand-brown">₹{Number(item.price * item.qty).toFixed(2)}</p>
                                             </div>
 
                                             <button 
@@ -116,15 +115,15 @@ const Cart = () => {
                             <h2 className="text-xl font-bold mb-6 relative z-10">Order Summary</h2>
                             
                             <div className="space-y-3 mb-6 relative z-10">
-                                <div className="flex justify-between text-gray-400 font-semibold text-sm">
+                                <div className="flex justify-between text-white font-semibold text-sm">
                                     <span>Subtotal</span>
-                                    <span className="text-white">₹{totalPrice}</span>
+                                    <span className="text-white">₹{Number(totalPrice).toFixed(2)}</span>
                                 </div>
-                                <div className="flex justify-between text-gray-400 font-semibold text-sm">
+                                <div className="flex justify-between text-white font-semibold text-sm">
                                     <span>Shipping</span>
                                     <span className="text-brand-red font-bold uppercase tracking-widest text-[10px]">Free</span>
                                 </div>
-                                <div className="flex justify-between text-gray-400 font-semibold text-sm">
+                                <div className="flex justify-between text-white font-semibold text-sm">
                                     <span>Tax (GST)</span>
                                     <span className="text-white">Included</span>
                                 </div>
@@ -132,8 +131,8 @@ const Cart = () => {
 
                             <div className="border-t border-white/10 pt-5 mb-8 relative z-10">
                                 <div className="flex justify-between items-end">
-                                    <span className="text-gray-400 font-semibold text-sm">Grand Total</span>
-                                    <span className="text-3xl font-bold text-brand-red">₹{totalPrice}</span>
+                                    <span className="text-white font-semibold text-sm">Grand Total</span>
+                                    <span className="text-3xl font-bold text-brand-red">₹{Number(totalPrice).toFixed(2)}</span>
                                 </div>
                             </div>
 
