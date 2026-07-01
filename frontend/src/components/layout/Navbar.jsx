@@ -86,6 +86,7 @@ const Navbar = () => {
                     <div className="flex flex-col">
                         <span className={`text-lg sm:text-xl font-black tracking-tight leading-none transition-colors duration-300 ${brandNameClass}`}>
                             MAHAVEER <span className={isScrolled ? 'text-[#8B4513]' : 'text-[#8B4513]'}>FOOD</span>
+
                         </span>
                         <span className={`text-[9px] sm:text-[10px] font-black tracking-[0.16em] uppercase transition-colors duration-300 ${brandTaglineClass}`}>
                             Products And Exporters
@@ -170,9 +171,9 @@ const Navbar = () => {
                         </AnimatePresence>
                     </Link>
 
-                    {/* Auth Buttons */}
+                    {/* Auth Buttons — hidden below lg; available in the mobile menu instead */}
                     {user ? (
-                        <div className="flex items-center gap-3">
+                        <div className="hidden lg:flex items-center gap-3">
                             <span className={`text-sm font-semibold ${loginTextClass}`}>Hi, {user.name.split(' ')[0]}</span>
                             <button
                                 onClick={logout}
@@ -182,7 +183,7 @@ const Navbar = () => {
                             </button>
                         </div>
                     ) : (
-                        <div className="flex items-center gap-2">
+                        <div className="hidden lg:flex items-center gap-2">
                             <Link
                                 to="/login"
                                 className={`px-4 py-2 text-sm font-semibold transition-colors ${loginTextClass}`}
