@@ -35,19 +35,27 @@ const Navbar = () => {
         { name: 'Contact', path: '/contact' },
     ];
 
-    const defaultNavText = isScrolled ? 'text-gray-700 hover:text-brand-brown' : 'text-brand-cream hover:text-brand-brown';
+    // Colors use arbitrary hex values (not brand-* utilities) because the JS
+    // Tailwind config isn't loaded in this v4 setup, so brand-* classes are
+    // no-ops. text-white is also globally overridden in index.css, so it is
+    // avoided here. #8B4513 brown, #FFF8DC cream, #5D2E0C dark brown.
+    const defaultNavText = isScrolled
+        ? 'text-gray-700 hover:text-[#8B4513]'
+        : 'text-[#FFF8DC] hover:text-[#8B4513]';
+    const activeNavText = isScrolled ? 'text-[#8B4513]' : 'text-[#8B4513]';
+    const navUnderline = isScrolled ? 'bg-[#8B4513]' : 'bg-[#8B4513]';
     const defaultActionButton = isScrolled
-        ? 'bg-transparent text-gray-800 hover:bg-brand-cream hover:text-brand-brown'
-        : 'bg-black/30 backdrop-blur-md border border-white/20 text-brand-cream hover:bg-black/45 hover:text-brand-brown';
+        ? 'bg-transparent text-gray-800 hover:bg-black/5 hover:text-[#8B4513]'
+        : 'bg-black/30 backdrop-blur-md border border-white/25 text-[#FFF8DC] hover:bg-black/50 hover:text-[#8B4513]';
     const loginTextClass = isScrolled
-        ? 'text-gray-800 hover:text-brand-brown'
-        : 'text-brand-cream hover:text-brand-brown';
+        ? 'text-gray-800 hover:text-[#8B4513]'
+        : 'text-[#FFF8DC] hover:text-[#8B4513]';
     const signupClass = isScrolled
-        ? 'px-4 py-2 text-sm font-semibold bg-brand-brown text-white rounded-xl hover:bg-brand-darkBrown transition-colors'
-        : 'px-4 py-2 text-sm font-semibold bg-brand-cream text-brand-brown rounded-xl hover:bg-brand-light transition-colors shadow-sm';
-    const dividerClass = isScrolled ? 'bg-gray-300' : 'bg-white/25';
-    const brandNameClass = isScrolled ? 'text-gray-900' : 'text-brand-cream';
-    const brandTaglineClass = isScrolled ? 'text-gray-600' : 'text-brand-cream/80';
+        ? 'px-4 py-2 text-sm font-semibold bg-[#8B4513] text-[#FFF8DC] rounded-xl hover:bg-[#5D2E0C] transition-colors'
+        : 'px-4 py-2 text-sm font-semibold bg-[#FFF8DC] text-[#8B4513] rounded-xl hover:bg-white transition-colors';
+    const dividerClass = isScrolled ? 'bg-gray-300' : 'bg-white/30';
+    const brandNameClass = isScrolled ? 'text-gray-900' : 'text-[#FFF8DC]';
+    const brandTaglineClass = isScrolled ? 'text-gray-600' : 'text-[#FFF8DC]/80';
 
     return (
         <motion.nav 
@@ -59,7 +67,13 @@ const Navbar = () => {
                 : 'bg-transparent py-6'
             }`}
         >
-            <div className="max-w-full mx-auto px-6 sm:px-12 lg:px-20 flex justify-between items-center">
+            {/* Dark scrim for guaranteed contrast over the hero while at the top; fades out on scroll */}
+            <div
+                className={`pointer-events-none absolute inset-0 bg-gradient-to-b from-black/70 via-black/40 to-transparent transition-opacity duration-500 ${
+                    isScrolled ? 'opacity-0' : 'opacity-100'
+                }`}
+            />
+            <div className="relative max-w-full mx-auto px-6 sm:px-12 lg:px-20 flex justify-between items-center">
                 {/* Logo */}
                 <Link to="/" className="group flex items-center gap-3">
                     <motion.div 
@@ -70,10 +84,10 @@ const Navbar = () => {
                         <img src={mfpeLogo} alt="Mahaveer Food Products" className="w-12 h-12 object-cover rounded-full" />
                     </motion.div>
                     <div className="flex flex-col">
-                        <span className={`text-lg sm:text-xl font-black text-white tracking-tight leading-none transition-colors duration-300 ${brandNameClass}`}>
-                            MAHAVEER <span className="text-white">FOOD</span>
+                        <span className={`text-lg sm:text-xl font-black tracking-tight leading-none transition-colors duration-300 ${brandNameClass}`}>
+                            MAHAVEER <span className={isScrolled ? 'text-[#8B4513]' : 'text-[#8B4513]'}>FOOD</span>
                         </span>
-                        <span className={`text-[9px] sm:text-[10px] font-black tracking-[0.16em] uppercase text-gray-400 transition-colors duration-300 ${brandTaglineClass}`}>
+                        <span className={`text-[9px] sm:text-[10px] font-black tracking-[0.16em] uppercase transition-colors duration-300 ${brandTaglineClass}`}>
                             Products And Exporters
                         </span>
                     </div>
@@ -88,16 +102,16 @@ const Navbar = () => {
                             className="relative px-5 py-2 group"
                         >
                             <span className={`text-sm font-black transition-colors duration-300 ${
-                                location.pathname === link.path 
-                                ? 'text-brand-brown' 
+                                location.pathname === link.path
+                                ? activeNavText
                                 : defaultNavText
                             }`}>
                                 {link.name}
                             </span>
                             {location.pathname === link.path && (
-                                <motion.div 
+                                <motion.div
                                     layoutId="navUnderline"
-                                    className="absolute bottom-0 left-5 right-5 h-0.5 bg-brand-brown rounded-full"
+                                    className={`absolute bottom-0 left-5 right-5 h-0.5 rounded-full ${navUnderline}`}
                                 />
                             )}
                         </Link>
@@ -120,7 +134,7 @@ const Navbar = () => {
                                     initial={{ scale: 0, opacity: 0 }}
                                     animate={{ scale: 1, opacity: 1 }}
                                     exit={{ scale: 0, opacity: 0 }}
-                                    className="absolute -top-1.5 -right-1.5 text-[11px] font-black rounded-full h-5 w-5 flex items-center justify-center border-2 shadow-md bg-brand-red text-white border-white"
+                                    className="absolute -top-1.5 -right-1.5 text-[11px] font-black rounded-full h-5 w-5 flex items-center justify-center border-2 shadow-md bg-[#CD5C5C] text-[#FFFFFF] border-white"
                                 >
                                     {wishlistCount}
                                 </motion.span>
@@ -136,8 +150,8 @@ const Navbar = () => {
                             whileTap={{ scale: 0.95 }}
                             className={`p-3 rounded-2xl transition-all duration-500 ${
                                 isScrolled
-                                    ? 'bg-brand-cream text-brand-brown hover:bg-brand-light'
-                                    : 'bg-brand-cream/95 text-brand-brown shadow-md hover:bg-white'
+                                    ? 'bg-[#FFF8DC] text-[#8B4513] hover:bg-[#F5DEB3]'
+                                    : 'bg-[#FFF8DC] text-[#8B4513] hover:bg-white'
                             }`}
                         >
                             <ShoppingCart size={20} />
@@ -148,7 +162,7 @@ const Navbar = () => {
                                     initial={{ scale: 0, opacity: 0 }}
                                     animate={{ scale: 1, opacity: 1 }}
                                     exit={{ scale: 0, opacity: 0 }}
-                                    className="absolute -top-1.5 -right-1.5 text-[11px] font-black rounded-full h-5 w-5 flex items-center justify-center border-2 border-white bg-brand-red text-white"
+                                    className="absolute -top-1.5 -right-1.5 text-[11px] font-black rounded-full h-5 w-5 flex items-center justify-center border-2 border-white bg-[#CD5C5C] text-[#FFFFFF]"
                                 >
                                     {cartCount}
                                 </motion.span>

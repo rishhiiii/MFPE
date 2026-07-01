@@ -111,6 +111,9 @@ const ProductDetail = () => {
                                 <Heart size={20} />
                             </button>
                         </div>
+                        <p className="mt-3 text-center text-xs text-gray-500 italic">
+                            * Product images are for representation only. The actual product may vary in appearance, colour, and packaging.
+                        </p>
                     </motion.div>
 
                     {/* Right: Product Info */}
@@ -223,39 +226,39 @@ const ProductDetail = () => {
                                 >
                                     {/* Dynamic specifications from product */}
                                     {product.ingredients && (
-                                        <div key="ingredients" className="flex justify-between p-4 bg-brand-cream rounded-xl">
-                                            <span className="font-bold text-gray-400 uppercase text-xs tracking-widest">Ingredients</span>
-                                            <span className="font-black text-gray-900">{product.ingredients}</span>
+                                        <div key="ingredients" className="flex justify-between items-start gap-6 p-4 bg-brand-cream rounded-xl">
+                                            <span className="font-bold text-gray-400 uppercase text-xs tracking-widest flex-shrink-0">Ingredients</span>
+                                            <span className="font-black text-gray-900 text-right">{product.ingredients}</span>
                                         </div>
                                     )}
                                     {product.shelfLife && (
-                                        <div key="shelfLife" className="flex justify-between p-4 bg-brand-cream rounded-xl">
-                                            <span className="font-bold text-gray-400 uppercase text-xs tracking-widest">Shelf Life</span>
-                                            <span className="font-black text-gray-900">{product.shelfLife}</span>
+                                        <div key="shelfLife" className="flex justify-between items-start gap-6 p-4 bg-brand-cream rounded-xl">
+                                            <span className="font-bold text-gray-400 uppercase text-xs tracking-widest flex-shrink-0">Shelf Life</span>
+                                            <span className="font-black text-gray-900 text-right">{product.shelfLife}</span>
                                         </div>
                                     )}
                                     {product.weight && (
-                                        <div key="weight" className="flex justify-between p-4 bg-brand-cream rounded-xl">
-                                            <span className="font-bold text-gray-400 uppercase text-xs tracking-widest">Weight</span>
-                                            <span className="font-black text-gray-900">{product.weight}</span>
+                                        <div key="weight" className="flex justify-between items-start gap-6 p-4 bg-brand-cream rounded-xl">
+                                            <span className="font-bold text-gray-400 uppercase text-xs tracking-widest flex-shrink-0">Weight</span>
+                                            <span className="font-black text-gray-900 text-right">{product.weight}</span>
                                         </div>
                                     )}
                                     {product.storage && (
-                                        <div key="storage" className="flex justify-between p-4 bg-brand-cream rounded-xl">
-                                            <span className="font-bold text-gray-400 uppercase text-xs tracking-widest">Storage</span>
-                                            <span className="font-black text-gray-900">{product.storage}</span>
+                                        <div key="storage" className="flex justify-between items-start gap-6 p-4 bg-brand-cream rounded-xl">
+                                            <span className="font-bold text-gray-400 uppercase text-xs tracking-widest flex-shrink-0">Storage</span>
+                                            <span className="font-black text-gray-900 text-right">{product.storage}</span>
                                         </div>
                                     )}
                                     {product.origin && (
-                                        <div key="origin" className="flex justify-between p-4 bg-brand-cream rounded-xl">
-                                            <span className="font-bold text-gray-400 uppercase text-xs tracking-widest">Origin</span>
-                                            <span className="font-black text-gray-900">{product.origin}</span>
+                                        <div key="origin" className="flex justify-between items-start gap-6 p-4 bg-brand-cream rounded-xl">
+                                            <span className="font-bold text-gray-400 uppercase text-xs tracking-widest flex-shrink-0">Origin</span>
+                                            <span className="font-black text-gray-900 text-right">{product.origin}</span>
                                         </div>
                                     )}
                                     {product.packaging && (
-                                        <div key="packaging" className="flex justify-between p-4 bg-brand-cream rounded-xl">
-                                            <span className="font-bold text-gray-400 uppercase text-xs tracking-widest">Packaging</span>
-                                            <span className="font-black text-gray-900">{product.packaging}</span>
+                                        <div key="packaging" className="flex justify-between items-start gap-6 p-4 bg-brand-cream rounded-xl">
+                                            <span className="font-bold text-gray-400 uppercase text-xs tracking-widest flex-shrink-0">Packaging</span>
+                                            <span className="font-black text-gray-900 text-right">{product.packaging}</span>
                                         </div>
                                     )}
                                     {/* Fallback to default specs if no product specs */}
@@ -267,9 +270,9 @@ const ProductDetail = () => {
                                         { label: "Origin", value: "Gujarat, India" },
                                         { label: "Packaging", value: "Eco-friendly Recyclable Bag" }
                                     ].map((spec) => (
-                                        <div key={spec.label} className="flex justify-between p-4 bg-brand-cream rounded-xl">
-                                            <span className="font-bold text-gray-400 uppercase text-xs tracking-widest">{spec.label}</span>
-                                            <span className="font-black text-gray-900">{spec.value}</span>
+                                        <div key={spec.label} className="flex justify-between items-start gap-6 p-4 bg-brand-cream rounded-xl">
+                                            <span className="font-bold text-gray-400 uppercase text-xs tracking-widest flex-shrink-0">{spec.label}</span>
+                                            <span className="font-black text-gray-900 text-right">{spec.value}</span>
                                         </div>
                                     ))}
                                 </motion.div>

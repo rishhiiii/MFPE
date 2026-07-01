@@ -113,6 +113,10 @@ const Footer = () => {
                         <Link to="/shipping-policy" className="hover:text-brand-brown transition-colors">Shipping Policy</Link>
                     </div>
                 </div>
+
+                <p className="mt-6 text-center text-xs text-gray-500 font-body">
+                    Note: Product images shown on this website are for illustration purposes only. The actual product may vary in appearance, colour, and packaging.
+                </p>
             </div>
         </footer>
     );
