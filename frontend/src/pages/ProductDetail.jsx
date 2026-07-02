@@ -21,8 +21,6 @@ import { useCart } from '../context/CartContext';
 import jaggery1 from '../assets/jaggery1.jpeg';
 import jaggery2 from '../assets/jaggery2.jpeg';
 import jaggery3 from '../assets/jaggery3.jpeg';
-import { TEST_MODE } from '../lib/testMode';
-import dummyProducts from '../data/dummyProducts';
 
 const getProductImage = (imagePath) => {
     if (!imagePath) return jaggery1;
@@ -43,11 +41,6 @@ const ProductDetail = () => {
     useEffect(() => {
         window.scrollTo(0, 0);
         const fetchProduct = async () => {
-            if (TEST_MODE) {
-                setProduct(dummyProducts.find(p => p._id === id) || null);
-                setLoading(false);
-                return;
-            }
             try {
                 const { data } = await api.get(`/api/products/${id}`);
                 setProduct(data);

@@ -15,7 +15,7 @@ const orderSchema = mongoose.Schema({
         {
             name: { type: String, required: true },
             qty: { type: Number, required: true },
-            image: { type: String, required: true },
+            image: { type: String, default: '' },
             price: { type: Number, required: true },
             product: {
                 type: mongoose.Schema.Types.ObjectId,
@@ -33,7 +33,7 @@ const orderSchema = mongoose.Schema({
     totalPrice: { type: Number, required: true, default: 0.0 },
     isPaid: { type: Boolean, required: true, default: false },
     paidAt: { type: Date },
-    razorpayOrderId: { type: String },
+    razorpayOrderId: { type: String, index: true },
     razorpayPaymentId: { type: String },
     razorpaySignature: { type: String }
 }, {

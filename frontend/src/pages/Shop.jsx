@@ -1,7 +1,5 @@
 import React, { useState, useEffect } from 'react';
 import api from '../lib/api';
-import { TEST_MODE } from '../lib/testMode';
-import dummyProducts from '../data/dummyProducts';
 import { motion } from 'framer-motion';
 import { Search } from 'lucide-react';
 import { useSearchParams } from 'react-router-dom';
@@ -26,12 +24,6 @@ const Shop = () => {
 
     useEffect(() => {
         const fetchProducts = async () => {
-            if (TEST_MODE) {
-                setProducts(dummyProducts);
-                setFilteredProducts(dummyProducts);
-                setLoading(false);
-                return;
-            }
             try {
                 const { data } = await api.get('/api/products');
                 setProducts(data);

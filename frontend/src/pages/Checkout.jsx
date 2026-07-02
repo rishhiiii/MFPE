@@ -1,11 +1,10 @@
 import React, { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
-import { CreditCard, ShoppingBag, ArrowLeft, CheckCircle2, Info } from 'lucide-react';
+import { CreditCard, ShoppingBag, ArrowLeft, CheckCircle2 } from 'lucide-react';
 import { useCart } from '../context/CartContext';
 import { useAuth } from '../context/AuthContext';
 import { Link, useNavigate } from 'react-router-dom';
 import api, { API_BASE_URL } from '../lib/api';
-import { TEST_MODE } from '../lib/testMode';
 import jaggery1 from '../assets/jaggery1.jpeg';
 import jaggery2 from '../assets/jaggery2.jpeg';
 import jaggery3 from '../assets/jaggery3.jpeg';
@@ -69,15 +68,12 @@ const Checkout = () => {
     const handlePayment = async (e) => {
         e.preventDefault();
 
-        // In test mode there is no backend, so skip the real payment flow entirely.
-        if (TEST_MODE) return;
-
         // Validate cart total
         if (totalPrice < 1) {
             alert('Minimum order amount is ₹1');
             return;
         }
-        
+
         // Validate form
         const requiredFields = ['name', 'email', 'phone', 'address', 'city', 'state', 'pincode'];
         for (const field of requiredFields) {
@@ -88,7 +84,7 @@ const Checkout = () => {
         }
 
         setIsProcessing(true);
-        
+
         const res = await loadRazorpay();
         if (!res) {
             alert('Razorpay SDK failed to load. Are you online?');
@@ -97,14 +93,17 @@ const Checkout = () => {
         }
 
         try {
-            console.log('Creating Razorpay order with amount:', totalPrice);
+            // Only send product ids + quantities; the backend computes the real
+            // price from the database so the amount can't be tampered with.
+            const items = cartItems.map(item => ({ product: item._id, qty: item.qty }));
+
             const { data: order } = await api.post('/api/payment/order', {
-                amount: totalPrice
+                items,
+                shippingAddress: formData
             });
-            console.log('Razorpay order created:', order);
 
             const options = {
-                key: import.meta.env.VITE_RAZORPAY_KEY_ID || "rzp_test_T5MXOwKAFBdcby",
+                key: order.keyId || import.meta.env.VITE_RAZORPAY_KEY_ID,
                 amount: order.amount,
                 currency: order.currency || "INR",
                 name: "Mahaveer Food Products",
@@ -122,31 +121,28 @@ const Checkout = () => {
                     color: "#8B4513"
                 },
                 handler: async function (response) {
-                    console.log('Payment successful:', response);
                     try {
-                        // Prepare order items for backend
-                        const orderItems = cartItems.map(item => ({
-                            name: item.name,
-                            qty: item.qty,
-                            image: item.image,
-                            price: item.price,
-                            product: item._id
-                        }));
-
                         const verifyRes = await api.post('/api/payment/verify', {
-                            ...response,
-                            shippingAddress: formData,
-                            orderItems,
-                            totalPrice
+                            razorpay_order_id: response.razorpay_order_id,
+                            razorpay_payment_id: response.razorpay_payment_id,
+                            razorpay_signature: response.razorpay_signature
                         });
-                        
+
                         if (verifyRes.data.success) {
                             setPaymentSuccess(true);
                             clearCart();
+                        } else {
+                            alert('Payment verification failed. If money was debited, please contact us.');
+                            setIsProcessing(false);
                         }
                     } catch (err) {
                         console.error('Verification error:', err);
-                        alert("Verification failed!");
+                        alert('Payment verification failed. If money was debited, please contact us.');
+                        setIsProcessing(false);
+                    }
+                },
+                modal: {
+                    ondismiss: function () {
                         setIsProcessing(false);
                     }
                 }
@@ -163,7 +159,8 @@ const Checkout = () => {
             rzp.open();
         } catch (error) {
             console.error("Payment initiation failed", error);
-            alert(`Payment failed to start: ${error.message}`);
+            const message = error.response?.data?.error || error.message || 'Please try again.';
+            alert(`Payment failed to start: ${message}`);
             setIsProcessing(false);
         }
     };
@@ -327,32 +324,14 @@ const Checkout = () => {
                                     />
                                 </div>
 
-                                {TEST_MODE ? (
-                                    <div className="space-y-4">
-                                        <div className="flex items-start gap-3 p-4 bg-amber-50 border border-amber-200 rounded-xl">
-                                            <Info size={20} className="text-amber-600 flex-shrink-0 mt-0.5" />
-                                            <p className="text-sm text-amber-800">
-                                                <span className="font-semibold">Online payments are launching soon.</span> Our store is currently in preview mode — you can browse products and build your cart, and secure online checkout will be enabled shortly. To place an order in the meantime, please reach us via the <Link to="/contact" className="font-semibold underline">Contact</Link> page.
-                                            </p>
-                                        </div>
-                                        <button
-                                            type="button"
-                                            disabled
-                                            className="w-full bg-brand-brown text-white py-4 rounded-xl font-bold text-lg flex items-center justify-center gap-2 opacity-60 cursor-not-allowed"
-                                        >
-                                            <CreditCard size={20} /> Payments Coming Soon
-                                        </button>
-                                    </div>
-                                ) : (
-                                    <button
-                                        type="submit"
-                                        disabled={isProcessing}
-                                        className="w-full bg-brand-brown text-white py-4 rounded-xl font-bold text-lg flex items-center justify-center gap-2 hover:bg-brand-darkBrown transition-all shadow-lg shadow-brand-light disabled:opacity-50"
-                                    >
-                                        <CreditCard size={20} />
-                                        {isProcessing ? 'Processing...' : `Pay ₹${Number(totalPrice).toFixed(2)}`}
-                                    </button>
-                                )}
+                                <button
+                                    type="submit"
+                                    disabled={isProcessing}
+                                    className="w-full bg-brand-brown text-white py-4 rounded-xl font-bold text-lg flex items-center justify-center gap-2 hover:bg-brand-darkBrown transition-all shadow-lg shadow-brand-light disabled:opacity-50"
+                                >
+                                    <CreditCard size={20} />
+                                    {isProcessing ? 'Processing...' : `Pay ₹${Number(totalPrice).toFixed(2)}`}
+                                </button>
                             </form>
                         </motion.div>
                     </div>
