@@ -6,6 +6,7 @@ const mongoose = require('mongoose');
 const Order = require('../models/Order');
 const Product = require('../models/Product');
 const { isDbConnected } = require('../config/db');
+const { protect, admin } = require('../middleware/authMiddleware');
 
 const keyId = process.env.RAZORPAY_KEY_ID;
 const keySecret = process.env.RAZORPAY_KEY_SECRET;
@@ -145,13 +146,21 @@ const finalizeOrder = async (razorpayOrderId, razorpayPaymentId, razorpaySignatu
     order.razorpayPaymentId = razorpayPaymentId;
     if (razorpaySignature) order.razorpaySignature = razorpaySignature;
     order.paymentResult = { id: razorpayPaymentId, status: 'captured' };
+    // Move a just-paid order into the fulfilment queue (unless already advanced).
+    if (order.status === 'Pending') order.status = 'Processing';
     await order.save();
 
-    // Decrement stock for each purchased item.
+    // Decrement stock for each purchased item with a floor check.
     await Promise.all(
-        order.orderItems.map((item) =>
-            Product.updateOne({ _id: item.product }, { $inc: { stock: -item.qty } })
-        )
+        order.orderItems.map(async (item) => {
+            const result = await Product.updateOne(
+                { _id: item.product, stock: { $gte: item.qty } },
+                { $inc: { stock: -item.qty } }
+            );
+            if (result.matchedCount === 0) {
+                console.warn(`Stock floor hit finalizing order ${order._id}: product ${item.product} had insufficient stock for qty ${item.qty}. Order remains marked paid — flag for manual fulfillment review.`);
+            }
+        })
     );
 
     return { found: true, order, alreadyPaid: false };
@@ -251,7 +260,7 @@ router.post('/webhook', async (req, res) => {
 });
 
 // Get all orders (for admin)
-router.get('/orders', async (req, res) => {
+router.get('/orders', protect, admin, async (req, res) => {
     try {
         if (!isDbConnected()) {
             return res.json([]);
@@ -262,6 +271,35 @@ router.get('/orders', async (req, res) => {
         res.json(orders);
     } catch (error) {
         res.status(500).json({ message: error.message || 'Unable to fetch orders' });
+    }
+});
+
+// Update an order's fulfilment status / tracking number (admin only)
+const ORDER_STATUSES = ['Pending', 'Processing', 'Shipped', 'Delivered', 'Cancelled'];
+router.patch('/orders/:id', protect, admin, async (req, res) => {
+    try {
+        if (!isDbConnected()) {
+            return res.status(503).json({ message: 'Database is unavailable' });
+        }
+
+        const { status, trackingNumber } = req.body;
+        if (status !== undefined && !ORDER_STATUSES.includes(status)) {
+            return res.status(400).json({ message: `Invalid status. Allowed: ${ORDER_STATUSES.join(', ')}` });
+        }
+
+        const order = await Order.findById(req.params.id);
+        if (!order) {
+            return res.status(404).json({ message: 'Order not found' });
+        }
+
+        if (status !== undefined) order.status = status;
+        if (trackingNumber !== undefined) order.trackingNumber = String(trackingNumber).trim();
+        await order.save();
+
+        res.json(order);
+    } catch (error) {
+        console.error('Error updating order:', error.message);
+        res.status(400).json({ message: error.message || 'Unable to update order' });
     }
 });
 

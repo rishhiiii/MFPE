@@ -7,7 +7,7 @@ const PrivacyPolicy = () => {
       title="Privacy"
       highlight="Policy"
       subtitle="Your privacy matters to us. This policy explains how we collect, use, and protect your information."
-      lastUpdated="1 July 2026"
+      lastUpdated="3 July 2026"
     >
       <PolicySection>
         <p>
@@ -22,10 +22,11 @@ const PrivacyPolicy = () => {
         <p>We may collect the following information:</p>
         <PolicyList
           items={[
-            'Personal details you provide, such as your name, email address, phone number, and shipping/billing address;',
-            'Order information, including the products you purchase and transaction history;',
+            'Personal details you provide, such as your name, mobile number, email address, and shipping/billing address;',
+            'Order history, including the products you purchase and your transaction records;',
+            'Payment details, processed securely through our payment gateway (see “Payment Information” below);',
             'Account details if you register or sign in (including through Google Sign-In via Firebase Authentication);',
-            'Technical data such as your IP address, browser type, and device information, collected automatically as you browse.',
+            'Device and browser information, such as your IP address, browser type, and device details, collected automatically as you browse.',
           ]}
         />
       </PolicySection>
@@ -34,9 +35,11 @@ const PrivacyPolicy = () => {
         <PolicyList
           items={[
             'To process, fulfil, and deliver your orders;',
-            'To communicate with you about your orders, inquiries, and support requests;',
+            'To send you order updates and provide customer support;',
+            'To communicate with you about your inquiries and requests;',
             'To manage your account and provide a personalised experience;',
             'To improve our website, products, and services;',
+            'To inform you about offers and promotions, only with your consent;',
             'To comply with legal obligations and prevent fraud.',
           ]}
         />

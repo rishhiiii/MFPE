@@ -33,6 +33,14 @@ const orderSchema = mongoose.Schema({
     totalPrice: { type: Number, required: true, default: 0.0 },
     isPaid: { type: Boolean, required: true, default: false },
     paidAt: { type: Date },
+    // Fulfilment workflow for the admin panel. A freshly paid order starts at
+    // 'Processing'; admins advance it through the lifecycle.
+    status: {
+        type: String,
+        enum: ['Pending', 'Processing', 'Shipped', 'Delivered', 'Cancelled'],
+        default: 'Pending',
+    },
+    trackingNumber: { type: String, default: '' },
     razorpayOrderId: { type: String, index: true },
     razorpayPaymentId: { type: String },
     razorpaySignature: { type: String }
