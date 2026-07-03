@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { Link, useLocation } from 'react-router-dom';
-import { ShoppingCart, Menu, X, User, Heart, LogOut } from 'lucide-react';
+import { ShoppingCart, Menu, X, User, Heart, LogOut, LayoutDashboard } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useCart } from '../../context/CartContext';
 import { useAuth } from '../../context/AuthContext';
@@ -174,6 +174,14 @@ const Navbar = () => {
                     {/* Auth Buttons — hidden below lg; available in the mobile menu instead */}
                     {user ? (
                         <div className="hidden lg:flex items-center gap-3">
+                            {user.role === 'admin' && (
+                                <Link
+                                    to="/admin"
+                                    className="inline-flex items-center gap-1.5 px-3 py-2 rounded-xl text-sm font-bold bg-[#8B4513] text-[#FFF8DC] hover:bg-[#5D2E0C] transition-colors"
+                                >
+                                    <LayoutDashboard size={16} /> Admin
+                                </Link>
+                            )}
                             <span className={`text-sm font-semibold ${loginTextClass}`}>Hi, {user.name.split(' ')[0]}</span>
                             <button
                                 onClick={logout}
@@ -257,6 +265,15 @@ const Navbar = () => {
                                 {user ? (
                                     <div className="space-y-4">
                                         <p className="text-center text-lg font-semibold text-gray-700">Hi, {user.name}</p>
+                                        {user.role === 'admin' && (
+                                            <Link
+                                                to="/admin"
+                                                onClick={() => setIsMobileMenuOpen(false)}
+                                                className="w-full bg-[#8B4513] text-[#FFF8DC] py-4 rounded-2xl font-black flex items-center justify-center gap-2"
+                                            >
+                                                <LayoutDashboard size={20} /> Admin Panel
+                                            </Link>
+                                        )}
                                         <button
                                             onClick={() => {
                                                 logout();

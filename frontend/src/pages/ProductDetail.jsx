@@ -21,8 +21,6 @@ import { useCart } from '../context/CartContext';
 import jaggery1 from '../assets/jaggery1.jpeg';
 import jaggery2 from '../assets/jaggery2.jpeg';
 import jaggery3 from '../assets/jaggery3.jpeg';
-import { TEST_MODE } from '../lib/testMode';
-import dummyProducts from '../data/dummyProducts';
 
 const getProductImage = (imagePath) => {
     if (!imagePath) return jaggery1;
@@ -34,7 +32,7 @@ const getProductImage = (imagePath) => {
 const ProductDetail = () => {
     const { id } = useParams();
     const navigate = useNavigate();
-    const { addToCart } = useCart();
+    const { addToCart, addToWishlist, removeFromWishlist, wishlistItems } = useCart();
     const [product, setProduct] = useState(null);
     const [loading, setLoading] = useState(true);
     const [quantity, setQuantity] = useState(1);
@@ -43,11 +41,6 @@ const ProductDetail = () => {
     useEffect(() => {
         window.scrollTo(0, 0);
         const fetchProduct = async () => {
-            if (TEST_MODE) {
-                setProduct(dummyProducts.find(p => p._id === id) || null);
-                setLoading(false);
-                return;
-            }
             try {
                 const { data } = await api.get(`/api/products/${id}`);
                 setProduct(data);
@@ -107,9 +100,21 @@ const ProductDetail = () => {
 
 
                             {/* Wishlist Button */}
-                            <button className="absolute top-4 right-4 w-12 h-12 bg-white rounded-2xl flex items-center justify-center text-gray-400 hover:text-brand-brown shadow-xl transition-all hover:scale-110 active:scale-95">
-                                <Heart size={20} />
-                            </button>
+                            {product && (
+                                <button
+                                    onClick={() => {
+                                        const isInWishlist = wishlistItems.some(item => item._id === product._id);
+                                        if (isInWishlist) {
+                                            removeFromWishlist(product._id);
+                                        } else {
+                                            addToWishlist(product);
+                                        }
+                                    }}
+                                    className={`absolute top-4 right-4 w-12 h-12 bg-white rounded-2xl flex items-center justify-center shadow-xl transition-all hover:scale-110 active:scale-95 ${wishlistItems.some(item => item._id === product._id) ? 'text-brand-brown' : 'text-gray-400 hover:text-brand-brown'}`}
+                                >
+                                    <Heart size={20} fill={wishlistItems.some(item => item._id === product._id) ? 'currentColor' : 'none'} />
+                                </button>
+                            )}
                         </div>
                         <p className="mt-3 text-center text-xs text-gray-500 italic">
                             * Product images are for representation only. The actual product may vary in appearance, colour, and packaging.
@@ -275,6 +280,19 @@ const ProductDetail = () => {
                                             <span className="font-black text-gray-900 text-right">{spec.value}</span>
                                         </div>
                                     ))}
+                                </motion.div>
+                            )}
+                            {activeTab === 'reviews' && (
+                                <motion.div
+                                    key="reviews"
+                                    initial={{ opacity: 0, y: 10 }}
+                                    animate={{ opacity: 1, y: 0 }}
+                                    exit={{ opacity: 0, y: -10 }}
+                                    className="text-center py-12"
+                                >
+                                    <p className="text-gray-500 font-medium">
+                                        No reviews yet. Be the first to share your experience with {product?.name}.
+                                    </p>
                                 </motion.div>
                             )}
                         </AnimatePresence>

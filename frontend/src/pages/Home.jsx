@@ -16,8 +16,6 @@ import jaggeryNew4 from '../assets/jaggery new 4.jpeg';
 import jaggeryNew5 from '../assets/jaggery new 5.jpeg';
 import jaggeryNew6 from '../assets/jaggery new 6.jpeg';
 import jaggeryNew7 from '../assets/jaggery new 7.jpeg';
-import { TEST_MODE } from '../lib/testMode';
-import dummyProducts from '../data/dummyProducts';
 
 const getProductImage = (imagePath) => {
     if (!imagePath) return jaggery1;
@@ -39,11 +37,6 @@ const Home = () => {
 
     useEffect(() => {
         const fetchProducts = async () => {
-            if (TEST_MODE) {
-                setBestSellers(dummyProducts.slice(0, 4));
-                setLoading(false);
-                return;
-            }
             try {
                 const { data } = await api.get('/api/products');
                 setBestSellers(data.slice(0, 4));

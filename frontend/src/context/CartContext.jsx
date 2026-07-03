@@ -6,13 +6,23 @@ export const useCart = () => useContext(CartContext);
 
 export const CartProvider = ({ children }) => {
     const [cartItems, setCartItems] = useState(() => {
-        const savedCart = localStorage.getItem('cart');
-        return savedCart ? JSON.parse(savedCart) : [];
+        try {
+            const savedCart = localStorage.getItem('cart');
+            return savedCart ? JSON.parse(savedCart) : [];
+        } catch (err) {
+            console.error('Error loading cart:', err);
+            return [];
+        }
     });
 
     const [wishlistItems, setWishlistItems] = useState(() => {
-        const savedWishlist = localStorage.getItem('wishlist');
-        return savedWishlist ? JSON.parse(savedWishlist) : [];
+        try {
+            const savedWishlist = localStorage.getItem('wishlist');
+            return savedWishlist ? JSON.parse(savedWishlist) : [];
+        } catch (err) {
+            console.error('Error loading wishlist:', err);
+            return [];
+        }
     });
 
     useEffect(() => {

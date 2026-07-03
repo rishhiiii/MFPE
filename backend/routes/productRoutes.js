@@ -4,12 +4,20 @@ const Product = require('../models/Product');
 const { isDbConnected } = require('../config/db');
 const upload = require('../config/multer');
 const { uploadToCloudinary } = require('../config/cloudinary');
+const { protect, admin } = require('../middleware/authMiddleware');
+const { escapeRegex } = require('../utils/regexEscape');
 const fs = require('fs');
-const path = require('path');
 
-// Temporary in-memory storage when MongoDB not available
-let tempProducts = [];
-let nextProductId = 1;
+// The database is the single source of truth for products. If Mongo is
+// unreachable we fail loudly with 503 rather than silently accepting writes
+// that would be lost on restart. There is deliberately NO in-memory fallback.
+const requireDb = (res) => {
+  if (!isDbConnected()) {
+    res.status(503).json({ message: 'Store is temporarily unavailable. Please try again shortly.' });
+    return false;
+  }
+  return true;
+};
 
 const normalizeProductPayload = (payload) => ({
   name: payload.name?.trim() || '',
@@ -26,24 +34,46 @@ const normalizeProductPayload = (payload) => ({
   packaging: payload.packaging?.trim() || '',
 });
 
-// Get all products
-router.get('/', async (req, res) => {
-  try {
-    if (!isDbConnected()) {
-      console.log('Using in-memory product storage');
-      return res.json(tempProducts);
-    }
+// Enforce the fields a real product must have before it can be saved.
+const validateProduct = (data) => {
+  const missing = [];
+  if (!data.name) missing.push('name');
+  if (!data.description) missing.push('description');
+  if (!data.category) missing.push('category');
+  if (!(data.price > 0)) missing.push('price (must be greater than 0)');
+  return missing;
+};
 
+// Resolve an uploaded file to an image URL: Cloudinary first (permanent, CDN),
+// local /uploads path only as a fallback if Cloudinary is unreachable.
+const resolveImageUrl = async (file) => {
+  let imageUrl = `/uploads/${file.filename}`;
+  try {
+    const fileBuffer = fs.readFileSync(file.path);
+    imageUrl = await uploadToCloudinary(fileBuffer);
+    fs.unlinkSync(file.path); // drop the local copy once it's safely on Cloudinary
+  } catch (cloudErr) {
+    console.error('Cloudinary upload failed, keeping local image:', cloudErr.message);
+  }
+  return imageUrl;
+};
+
+// @desc   Get all products (with optional search + category filter)
+// @route  GET /api/products
+// @access Public
+router.get('/', async (req, res) => {
+  if (!requireDb(res)) return;
+  try {
     const { search = '', category = '' } = req.query;
     const filters = {};
 
     if (search) {
+      const safeSearch = escapeRegex(String(search).slice(0, 100));
       filters.$or = [
-        { name: { $regex: search, $options: 'i' } },
-        { description: { $regex: search, $options: 'i' } },
+        { name: { $regex: safeSearch, $options: 'i' } },
+        { description: { $regex: safeSearch, $options: 'i' } },
       ];
     }
-
     if (category) {
       filters.category = category;
     }
@@ -56,129 +86,65 @@ router.get('/', async (req, res) => {
   }
 });
 
-// Create product with Cloudinary image upload + local fallback
-router.post('/', upload.single('image'), async (req, res) => {
-  try {
-    console.log('Received create product request');
-    console.log('req.body:', req.body);
-    console.log('req.file:', req.file);
-    
-    let productData = normalizeProductPayload(req.body);
-    
-    // If file was uploaded, try Cloudinary first, else use local path
-    if (req.file) {
-      let imageUrl = `/uploads/${req.file.filename}`; // Local path by default
-      
-      // Try to upload to Cloudinary
-      try {
-        console.log('Uploading image to Cloudinary...');
-        // Read the file from disk to buffer for Cloudinary
-        const fileBuffer = fs.readFileSync(req.file.path);
-        imageUrl = await uploadToCloudinary(fileBuffer);
-        console.log('Upload complete! Image URL:', imageUrl);
-        
-        // Delete local file if Cloudinary upload successful
-        fs.unlinkSync(req.file.path);
-      } catch (cloudErr) {
-        console.error('Cloudinary upload failed, using local path:', cloudErr);
-        // Keep local file if Cloudinary fails
-      }
-      
-      productData.image = imageUrl;
-    }
-
-    if (!isDbConnected()) {
-      console.log('Saving product to in-memory storage');
-      const newProduct = {
-        _id: `temp-${nextProductId++}`,
-        ...productData,
-        createdAt: new Date(),
-        updatedAt: new Date()
-      };
-      tempProducts.unshift(newProduct); // Add to beginning for newest first
-      console.log('Saved new product:', newProduct);
-      return res.status(201).json(newProduct);
-    }
-
-    const product = new Product(productData);
-    const createdProduct = await product.save();
-    res.status(201).json(createdProduct);
-  } catch (error) {
-    console.error('Error creating product:', error);
-    res.status(400).json({ message: error.message || 'Unable to create product' });
-  }
-});
-
-// Get single product
+// @desc   Get a single product
+// @route  GET /api/products/:id
+// @access Public
 router.get('/:id', async (req, res) => {
+  if (!requireDb(res)) return;
   try {
-    if (!isDbConnected()) {
-      const product = tempProducts.find(p => p._id === req.params.id);
-      if (product) {
-        return res.json(product);
-      }
-      return res.status(404).json({ message: 'Product not found' });
-    }
-
     const product = await Product.findById(req.params.id);
     if (!product) {
       return res.status(404).json({ message: 'Product not found' });
     }
     res.json(product);
   } catch (error) {
-    res.status(500).json({ message: error.message || 'Unable to fetch product' });
+    // e.g. a malformed ObjectId in the URL
+    res.status(400).json({ message: 'Invalid product id' });
   }
 });
 
-// Update product with Cloudinary image upload
-router.put('/:id', upload.single('image'), async (req, res) => {
+// @desc   Create a product
+// @route  POST /api/products
+// @access Private/Admin
+router.post('/', protect, admin, upload.single('image'), async (req, res) => {
+  if (!requireDb(res)) return;
   try {
-    console.log('Received update product request');
-    console.log('req.params.id:', req.params.id);
-    console.log('req.body:', req.body);
-    console.log('req.file:', req.file);
-    
-    let productData = normalizeProductPayload(req.body);
-    
-    // Get existing product to preserve image if we don't have a new one
-    let existingProduct;
-    if (!isDbConnected()) {
-      existingProduct = tempProducts.find(p => p._id === req.params.id);
-    } else {
-      existingProduct = await Product.findById(req.params.id);
-    }
-    
-    // If file was uploaded, upload to Cloudinary
+    const productData = normalizeProductPayload(req.body);
     if (req.file) {
-      console.log('Uploading image to Cloudinary...');
-      try {
-        productData.image = await uploadToCloudinary(req.file.buffer);
-        console.log('Upload complete! Image URL:', productData.image);
-      } catch (cloudErr) {
-        console.error('Cloudinary upload error:', cloudErr);
-        // Keep existing image if Cloudinary fails
-        if (existingProduct) {
-          productData.image = existingProduct.image;
-        }
-      }
-    } else if (existingProduct && !productData.image) {
-      // If no new file and no new image URL, keep existing image
-      productData.image = existingProduct.image;
+      productData.image = await resolveImageUrl(req.file);
     }
 
-    if (!isDbConnected()) {
-      const index = tempProducts.findIndex(p => p._id === req.params.id);
-      if (index !== -1) {
-        tempProducts[index] = {
-          ...tempProducts[index],
-          ...productData,
-          updatedAt: new Date()
-        };
-        console.log('Updated product:', tempProducts[index]);
-        return res.json(tempProducts[index]);
-      }
-      console.log('Product not found in temp array');
+    const missing = validateProduct(productData);
+    if (missing.length) {
+      return res.status(400).json({ message: `Missing required fields: ${missing.join(', ')}` });
+    }
+
+    const createdProduct = await Product.create(productData);
+    res.status(201).json(createdProduct);
+  } catch (error) {
+    console.error('Error creating product:', error.message);
+    res.status(400).json({ message: error.message || 'Unable to create product' });
+  }
+});
+
+// @desc   Update a product
+// @route  PUT /api/products/:id
+// @access Private/Admin
+router.put('/:id', protect, admin, upload.single('image'), async (req, res) => {
+  if (!requireDb(res)) return;
+  try {
+    const existingProduct = await Product.findById(req.params.id);
+    if (!existingProduct) {
       return res.status(404).json({ message: 'Product not found' });
+    }
+
+    const productData = normalizeProductPayload(req.body);
+
+    if (req.file) {
+      productData.image = await resolveImageUrl(req.file);
+    } else if (!productData.image) {
+      // No new file and no new URL: keep the current image.
+      productData.image = existingProduct.image;
     }
 
     const updatedProduct = await Product.findByIdAndUpdate(
@@ -187,35 +153,23 @@ router.put('/:id', upload.single('image'), async (req, res) => {
       { new: true, runValidators: true }
     );
 
-    if (!updatedProduct) {
-      return res.status(404).json({ message: 'Product not found' });
-    }
-
     res.json(updatedProduct);
   } catch (error) {
-    console.error('Error updating product:', error);
+    console.error('Error updating product:', error.message);
     res.status(400).json({ message: error.message || 'Unable to update product' });
   }
 });
 
-// Delete product
-router.delete('/:id', async (req, res) => {
+// @desc   Delete a product
+// @route  DELETE /api/products/:id
+// @access Private/Admin
+router.delete('/:id', protect, admin, async (req, res) => {
+  if (!requireDb(res)) return;
   try {
-    if (!isDbConnected()) {
-      const initialLength = tempProducts.length;
-      tempProducts = tempProducts.filter(p => p._id !== req.params.id);
-      if (tempProducts.length < initialLength) {
-        return res.json({ message: 'Product deleted successfully' });
-      }
-      return res.status(404).json({ message: 'Product not found' });
-    }
-
     const deletedProduct = await Product.findByIdAndDelete(req.params.id);
-
     if (!deletedProduct) {
       return res.status(404).json({ message: 'Product not found' });
     }
-
     res.json({ message: 'Product deleted successfully' });
   } catch (error) {
     res.status(500).json({ message: error.message || 'Unable to delete product' });

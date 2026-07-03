@@ -12,15 +12,13 @@ cloudinary.config({
 // Function to upload image from buffer (for multer memory storage)
 const uploadToCloudinary = (buffer) => {
   return new Promise((resolve, reject) => {
-    console.log('Starting Cloudinary upload...');
     const uploadStream = cloudinary.uploader.upload_stream(
       { resource_type: "auto" },
       (error, result) => {
         if (error) {
-          console.error('Cloudinary upload error:', error);
+          console.error('Cloudinary upload error:', error.message);
           reject(error);
         } else {
-          console.log('Cloudinary upload successful:', result.secure_url);
           resolve(result.secure_url);
         }
       }

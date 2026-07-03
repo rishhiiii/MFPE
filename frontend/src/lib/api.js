@@ -10,4 +10,21 @@ const api = axios.create({
   baseURL: API_BASE_URL,
 });
 
+// Attach the logged-in user's JWT to every request automatically, so protected
+// (and admin-only) endpoints work without each call wiring up the header.
+api.interceptors.request.use((config) => {
+  try {
+    const stored = localStorage.getItem('user');
+    if (stored) {
+      const { token } = JSON.parse(stored);
+      if (token) {
+        config.headers.Authorization = `Bearer ${token}`;
+      }
+    }
+  } catch {
+    // ignore malformed localStorage; request just goes out unauthenticated
+  }
+  return config;
+});
+
 export default api;
