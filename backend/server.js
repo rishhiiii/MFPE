@@ -32,11 +32,17 @@ const allowedOrigins = (process.env.ALLOWED_ORIGINS || '')
 
 app.use(cors({
     origin: (origin, callback) => {
-        // Allow non-browser clients (no origin) and any origin when no allowlist is set.
-        if (!origin || allowedOrigins.length === 0 || allowedOrigins.includes(origin)) {
+        // For LOCAL DEVELOPMENT: allow all origins, or check against allowlist
+        // For PRODUCTION: keep the strict check
+        if (process.env.NODE_ENV === 'production') {
+            if (!origin || allowedOrigins.length === 0 || allowedOrigins.includes(origin)) {
+                return callback(null, true);
+            }
+            return callback(new Error(`Origin ${origin} not allowed by CORS`));
+        } else {
+            // LOCAL DEV: allow all origins!
             return callback(null, true);
         }
-        return callback(new Error(`Origin ${origin} not allowed by CORS`));
     },
 }));
 
