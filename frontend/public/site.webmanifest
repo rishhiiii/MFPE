@@ -1,0 +1,17 @@
+{
+  "name": "Mahaveer Food Products & Exporters",
+  "short_name": "Mahaveer Food",
+  "description": "Premium organic jaggery, superfoods, spices and FMCG products. Wholesale supply and global export from Bhopal, India.",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#ffffff",
+  "theme_color": "#C0392B",
+  "icons": [
+    {
+      "src": "/mfpelogo.jpeg",
+      "sizes": "512x512",
+      "type": "image/jpeg",
+      "purpose": "any maskable"
+    }
+  ]
+}

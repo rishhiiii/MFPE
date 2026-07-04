@@ -26,6 +26,7 @@ import { CartProvider } from './context/CartContext';
 import { AuthProvider } from './context/AuthContext';
 import { AnimatePresence } from 'framer-motion';
 import { MessageCircle } from 'lucide-react';
+import RouteSeo from './components/seo/RouteSeo';
 
 function ScrollToTop() {
   const location = useLocation();
@@ -43,6 +44,7 @@ function App() {
       <CartProvider>
         <Router>
           <ScrollToTop />
+          <RouteSeo />
           <div className="min-h-screen relative">
             <Navbar />
             <main>

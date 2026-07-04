@@ -18,6 +18,8 @@ import {
     ChevronRight
 } from 'lucide-react';
 import { useCart } from '../context/CartContext';
+import Seo from '../components/seo/Seo';
+import { SITE, absoluteUrl } from '../lib/seoConfig';
 import jaggery1 from '../assets/jaggery1.jpeg';
 import jaggery2 from '../assets/jaggery2.jpeg';
 import jaggery3 from '../assets/jaggery3.jpeg';
@@ -72,8 +74,51 @@ const ProductDetail = () => {
         </div>
     );
 
+    const productUrl = absoluteUrl(`/product/${product._id || id}`);
+    const productImage = absoluteUrl(getProductImage(product.image));
+    const productDescription = product.description
+        ? String(product.description).slice(0, 300)
+        : `Buy ${product.name} — premium organic quality from ${SITE.shortName}.`;
+
+    const productJsonLd = [
+        {
+            '@context': 'https://schema.org',
+            '@type': 'Product',
+            name: product.name,
+            description: productDescription,
+            image: [productImage],
+            sku: product._id || id,
+            brand: { '@type': 'Brand', name: SITE.shortName },
+            offers: {
+                '@type': 'Offer',
+                url: productUrl,
+                priceCurrency: 'INR',
+                price: Number(product.price).toFixed(2),
+                availability: 'https://schema.org/InStock',
+                seller: { '@type': 'Organization', name: SITE.name },
+            },
+        },
+        {
+            '@context': 'https://schema.org',
+            '@type': 'BreadcrumbList',
+            itemListElement: [
+                { '@type': 'ListItem', position: 1, name: 'Home', item: SITE.url },
+                { '@type': 'ListItem', position: 2, name: 'Shop', item: `${SITE.url}/shop` },
+                { '@type': 'ListItem', position: 3, name: product.name, item: productUrl },
+            ],
+        },
+    ];
+
     return (
         <div className="pt-20 pb-16 bg-brand-cream">
+            <Seo
+                title={product.name}
+                description={productDescription}
+                path={`/product/${product._id || id}`}
+                image={productImage}
+                type="product"
+                jsonLd={productJsonLd}
+            />
             <div className="max-w-full mx-auto px-6 sm:px-12 lg:px-20">
                 {/* Breadcrumbs */}
                 <div className="flex items-center gap-3 text-sm font-bold text-gray-400 mb-8 uppercase tracking-widest">
