@@ -68,34 +68,34 @@ const Cart = () => {
                                             <p className="text-xl font-bold text-gray-900">₹{Number(item.price).toFixed(2)}</p>
                                         </div>
 
-                                        <div className="flex items-center gap-5">
+                                        <div className="flex flex-wrap items-center justify-center sm:justify-end gap-3 sm:gap-5 w-full sm:w-auto">
                                             <div className="flex items-center bg-brand-cream rounded-lg p-1">
-                                                <button 
+                                                <button
                                                     onClick={() => {
                                                         if (item.qty > 1) {
                                                             addToCart({ ...item, qty: -1 });
                                                         }
-                                                    }} 
+                                                    }}
                                                     className="w-9 h-9 flex items-center justify-center rounded-md hover:bg-white transition-all text-gray-600"
                                                 >
                                                     <Minus size={16} />
                                                 </button>
                                                 <span className="w-9 text-center font-semibold text-base">{item.qty}</span>
-                                                <button 
-                                                    onClick={() => addToCart({ ...item, qty: 1 })} 
+                                                <button
+                                                    onClick={() => addToCart({ ...item, qty: 1 })}
                                                     className="w-9 h-9 flex items-center justify-center rounded-md hover:bg-white transition-all text-gray-600"
                                                 >
                                                     <Plus size={16} />
                                                 </button>
                                             </div>
-                                            
-                                            <div className="text-right min-w-[80px]">
+
+                                            <div className="text-right min-w-[64px] sm:min-w-[80px]">
                                                 <p className="text-gray-400 text-xs mb-0.5">Total</p>
                                                 <p className="text-lg font-bold text-brand-brown">₹{Number(item.price * item.qty).toFixed(2)}</p>
                                             </div>
 
-                                            <button 
-                                                onClick={() => removeFromCart(item._id)} 
+                                            <button
+                                                onClick={() => removeFromCart(item._id)}
                                                 className="p-2.5 text-gray-400 hover:text-brand-brown hover:bg-brand-cream rounded-lg transition-all"
                                             >
                                                 <Trash2 size={20} />

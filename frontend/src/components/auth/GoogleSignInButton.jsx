@@ -45,10 +45,14 @@ const GoogleSignInButton = ({ onCredential, text = 'continue_with' }) => {
     useEffect(() => {
         if (!GOOGLE_CLIENT_ID) return undefined;
         let cancelled = false;
+        let resizeTimer = null;
+        let lastWidth = 0;
 
         const render = () => {
             const el = containerRef.current;
             if (!el || !window.google?.accounts?.id) return;
+            const width = Math.min(400, Math.max(200, Math.floor(el.parentElement?.clientWidth || 320)));
+            lastWidth = width;
             window.google.accounts.id.initialize({
                 client_id: GOOGLE_CLIENT_ID,
                 callback: async ({ credential }) => {
@@ -71,16 +75,36 @@ const GoogleSignInButton = ({ onCredential, text = 'continue_with' }) => {
                 text,
                 logo_alignment: 'center',
                 // Google caps the button at 400px; fit it to the form.
-                width: Math.min(400, Math.max(200, Math.floor(el.parentElement?.clientWidth || 320))),
+                width,
             });
             setStatus('ready');
         };
 
+        // Re-fit the button if the viewport is resized or the device is
+        // rotated — Google only sizes it once at render time otherwise.
+        const handleResize = () => {
+            clearTimeout(resizeTimer);
+            resizeTimer = setTimeout(() => {
+                const el = containerRef.current;
+                if (!el) return;
+                const width = Math.min(400, Math.max(200, Math.floor(el.parentElement?.clientWidth || 320)));
+                if (Math.abs(width - lastWidth) >= 8) render();
+            }, 150);
+        };
+
         loadGoogleScript()
-            .then(() => !cancelled && render())
+            .then(() => {
+                if (cancelled) return;
+                render();
+                window.addEventListener('resize', handleResize);
+            })
             .catch(() => !cancelled && setStatus('error'));
 
-        return () => { cancelled = true; };
+        return () => {
+            cancelled = true;
+            clearTimeout(resizeTimer);
+            window.removeEventListener('resize', handleResize);
+        };
     }, [text]);
 
     if (!GOOGLE_CLIENT_ID) return null;

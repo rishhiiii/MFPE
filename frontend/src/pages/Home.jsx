@@ -31,10 +31,14 @@ const getProductImage = (imagePath) => {
     return imageMap[imagePath] || imagePath;
 };
 
+// How often the category slider auto-advances, in milliseconds.
+const CATEGORY_SLIDE_INTERVAL_MS = 3000;
+
 const Home = () => {
     const [bestSellers, setBestSellers] = useState([]);
     const [loading, setLoading] = useState(true);
     const [currentCategoryIndex, setCurrentCategoryIndex] = useState(0);
+    const [isSliderPaused, setIsSliderPaused] = useState(false);
     const sliderRef = useRef(null);
 
     useEffect(() => {
@@ -59,6 +63,17 @@ const Home = () => {
         { title: "Dry Fruits & Nuts", items: ["Almonds", "Cashews", "Raisins", "Pistachios"] },
         { title: "FMCG Products", items: ["Packaged Food Products", "Health Foods", "Grocery Essentials", "Daily Consumption Products", "Organic Lifestyle Products"] }
     ];
+
+    // Auto-advance the category slider every few seconds; pauses while the
+    // visitor is hovering over it so it doesn't jump away mid-read, and
+    // resumes automatically once they move away.
+    useEffect(() => {
+        if (isSliderPaused) return;
+        const timer = setInterval(() => {
+            setCurrentCategoryIndex((prev) => (prev + 1) % productCategories.length);
+        }, CATEGORY_SLIDE_INTERVAL_MS);
+        return () => clearInterval(timer);
+    }, [isSliderPaused, productCategories.length]);
 
     return (
         <div className="bg-brand-cream">
@@ -216,9 +231,11 @@ const Home = () => {
                         </p>
                     </motion.div>
                     
+                    {/* Auto-advances every few seconds; paused on hover so visitors can read. */}
+                    <div onMouseEnter={() => setIsSliderPaused(true)} onMouseLeave={() => setIsSliderPaused(false)}>
                     {/* Slider Controls */}
                     <div className="flex justify-center items-center gap-3 mb-5">
-                        <button 
+                        <button
                             onClick={() => setCurrentCategoryIndex(prev => prev === 0 ? productCategories.length - 1 : prev - 1)}
                             className="w-10 h-10 bg-brand-brown text-white rounded-xl flex items-center justify-center hover:bg-brand-darkBrown transition-all"
                         >
@@ -233,14 +250,14 @@ const Home = () => {
                                 />
                             ))}
                         </div>
-                        <button 
+                        <button
                             onClick={() => setCurrentCategoryIndex(prev => prev === productCategories.length - 1 ? 0 : prev + 1)}
                             className="w-10 h-10 bg-brand-brown text-white rounded-xl flex items-center justify-center hover:bg-brand-darkBrown transition-all"
                         >
                             <ChevronRight size={20} />
                         </button>
                     </div>
-                    
+
                     {/* Slider Content */}
                     <div className="relative overflow-hidden" ref={sliderRef}>
                         <motion.div
@@ -293,6 +310,7 @@ const Home = () => {
                                 </div>
                             </div>
                         </motion.div>
+                    </div>
                     </div>
                 </div>
             </section>
