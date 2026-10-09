@@ -36,16 +36,23 @@ const userSchema = mongoose.Schema(
       enum: ['customer', 'admin'],
       default: 'customer',
     },
+    // 'google' = created through "Sign in with Google" (no usable password).
+    authProvider: {
+      type: String,
+      enum: ['local', 'google'],
+      default: 'local',
+    },
   },
   {
     timestamps: true,
   }
 );
 
-// Encrypt password before saving
-userSchema.pre('save', async function (next) {
+// Encrypt password before saving. Mongoose 9 doesn't pass `next` to async
+// hooks: returning (or resolving) is what lets the save continue.
+userSchema.pre('save', async function () {
   if (!this.isModified('password')) {
-    return next();
+    return;
   }
   const salt = await bcrypt.genSalt(10);
   this.password = await bcrypt.hash(this.password, salt);

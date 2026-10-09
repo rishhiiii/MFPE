@@ -5,6 +5,9 @@ const rateLimit = require('express-rate-limit');
 const User = require('../models/User');
 const { isDbConnected } = require('../config/db');
 const { protect, admin } = require('../middleware/authMiddleware');
+const { verifyGoogleIdToken } = require('../utils/googleToken');
+const { escapeRegex } = require('../utils/regexEscape');
+const crypto = require('crypto');
 
 // Throttle credential endpoints to blunt brute-force / credential-stuffing.
 // 20 attempts per IP per 15 minutes is plenty for a human, painful for a bot.
@@ -88,6 +91,7 @@ router.post('/login', authLimiter, async (req, res) => {
         phone: user.phone,
         address: user.address,
         role: user.role,
+        authProvider: user.authProvider || 'local',
         token: generateToken(user._id),
       });
     } else {
@@ -95,6 +99,71 @@ router.post('/login', authLimiter, async (req, res) => {
     }
   } catch (error) {
     console.error(error);
+    res.status(500).json({ message: 'Server error' });
+  }
+});
+
+// @desc    Sign in / sign up with Google ("Sign in with Google" button)
+// @route   POST /api/auth/google
+// @access  Public
+// The browser sends the ID token ("credential") from Google's button. We verify
+// it with Google's public keys, then find or create the matching account and
+// return our own JWT, so Google users work everywhere normal users do
+// (orders, profile, checkout).
+router.post('/google', authLimiter, async (req, res) => {
+  const idToken = req.body?.credential || req.body?.idToken;
+  if (!idToken || typeof idToken !== 'string') {
+    return res.status(400).json({ message: 'Missing Google sign-in token' });
+  }
+
+  if (!process.env.GOOGLE_CLIENT_ID) {
+    console.error('Google sign-in attempted but GOOGLE_CLIENT_ID is not set (restart the backend after editing .env)');
+    return res.status(503).json({ message: 'Google sign-in is not set up on the server yet.' });
+  }
+
+  let payload;
+  try {
+    payload = await verifyGoogleIdToken(idToken);
+  } catch (error) {
+    console.error('Google sign-in token rejected:', error.message);
+    return res.status(401).json({ message: 'Google sign-in could not be verified. Please try again.' });
+  }
+
+  if (!payload.email || payload.email_verified !== true) {
+    return res.status(401).json({ message: 'Your Google account email is not verified.' });
+  }
+
+  try {
+    if (!isDbConnected()) {
+      return res.status(503).json({ message: 'Database is unavailable' });
+    }
+
+    const email = String(payload.email).toLowerCase();
+    let user = await User.findOne({ email: new RegExp(`^${escapeRegex(email)}$`, 'i') });
+
+    if (!user) {
+      user = await User.create({
+        name: payload.name || email.split('@')[0],
+        email,
+        // Required by the schema but never used: Google accounts sign in via Google.
+        password: crypto.randomBytes(32).toString('hex'),
+        authProvider: 'google',
+      });
+    }
+
+    res.json({
+      _id: user._id,
+      name: user.name,
+      email: user.email,
+      phone: user.phone,
+      address: user.address,
+      role: user.role,
+      authProvider: user.authProvider || 'local',
+      photo: payload.picture || '',
+      token: generateToken(user._id),
+    });
+  } catch (error) {
+    console.error('Google sign-in error:', error);
     res.status(500).json({ message: 'Server error' });
   }
 });
@@ -235,6 +304,7 @@ router.put('/me', protect, async (req, res) => {
         phone: updatedUser.phone,
         address: updatedUser.address,
         role: updatedUser.role,
+        authProvider: updatedUser.authProvider || 'local',
         token: generateToken(updatedUser._id),
       });
     } else {

@@ -6,7 +6,7 @@ import { Mail, Phone, MapPin } from 'lucide-react';
 // and easy to maintain. Matches the site's brand-cream / brand-brown styling.
 const PolicyLayout = ({ title, highlight, subtitle, lastUpdated, children }) => {
   return (
-    <div className="pt-32 pb-24 bg-brand-cream min-h-screen">
+    <div className="pt-40 pb-24 bg-brand-cream min-h-screen">
       <div className="max-w-full mx-auto px-6 sm:px-12 lg:px-20">
         {/* Header */}
         <motion.div
@@ -79,7 +79,7 @@ export const PolicyContact = () => (
     </div>
     <div className="flex items-start gap-3 text-gray-700">
       <MapPin className="w-5 h-5 text-brand-brown flex-shrink-0 mt-0.5" />
-      <span>H.No. 4, Patrakar Colony, Link Road No. 3, Bhopal, Madhya Pradesh 462003, India</span>
+      <span>Link Road No. 3, Kolar Road, Bhopal, Madhya Pradesh 462003, India</span>
     </div>
   </div>
 );

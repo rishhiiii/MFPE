@@ -1,7 +1,5 @@
 import React, { createContext, useState, useEffect, useContext } from 'react';
 import api from '../lib/api';
-import { auth, googleProvider, hasFirebaseConfig } from '../lib/firebase';
-import { signInWithPopup } from 'firebase/auth';
 
 const AuthContext = createContext();
 
@@ -17,7 +15,14 @@ export const AuthProvider = ({ children }) => {
     const storedUser = localStorage.getItem('user');
     if (storedUser) {
       try {
-        setUser(JSON.parse(storedUser));
+        const parsed = JSON.parse(storedUser);
+        // Sessions from the old Firebase Google login carry a token our backend
+        // can't verify; drop them so the person simply signs in again.
+        if (parsed?.isGoogleUser) {
+          localStorage.removeItem('user');
+        } else {
+          setUser(parsed);
+        }
       } catch (err) {
         console.error('Error loading user:', err);
       }
@@ -73,33 +78,18 @@ export const AuthProvider = ({ children }) => {
     }
   };
 
-  // Google Sign In/Sign Up
-  const signInWithGoogle = async () => {
+  // Google Sign In/Sign Up: `credential` is the ID token from Google's
+  // "Sign in with Google" button. The backend verifies it and returns a normal
+  // account + token (creating the account on first sign-in).
+  const signInWithGoogle = async (credential) => {
     try {
       setError(null);
-      if (!hasFirebaseConfig || !auth || !googleProvider) {
-        const errorMessage = 'Google sign-in is not configured. Add the VITE_FIREBASE_* values in frontend/.env.';
-        setError(errorMessage);
-        return { success: false, message: errorMessage };
-      }
-      const result = await signInWithPopup(auth, googleProvider);
-      const user = result.user;
-
-      // Get user details from Google
-      const userData = {
-        _id: user.uid,
-        name: user.displayName,
-        email: user.email,
-        phone: user.phoneNumber || '',
-        token: user.accessToken,
-        isGoogleUser: true
-      };
-
-      setUser(userData);
-      localStorage.setItem('user', JSON.stringify(userData));
+      const { data } = await api.post('/api/auth/google', { credential });
+      setUser(data);
+      localStorage.setItem('user', JSON.stringify(data));
       return { success: true };
     } catch (err) {
-      const errorMessage = err.message;
+      const errorMessage = err.response?.data?.message || 'Google sign-in failed. Please try again.';
       setError(errorMessage);
       return { success: false, message: errorMessage };
     }

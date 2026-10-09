@@ -2,16 +2,16 @@ import React from 'react';
 import { motion } from 'framer-motion';
 import { CheckCircle, ArrowRight } from 'lucide-react';
 import { Link } from 'react-router-dom';
-import jaggeryNew1 from '../assets/jaggery new 1.jpeg';
-import jaggeryNew2 from '../assets/jaggery new 2.jpeg';
-import jaggeryNew3 from '../assets/jaggery new 3.jpeg';
-import jaggeryNew4 from '../assets/jaggery new 4.jpeg';
-import jaggeryNew5 from '../assets/jaggery new 5.jpeg';
-import jaggeryNew6 from '../assets/jaggery new 6.jpeg';
+import gallery1 from '../assets/WhatsApp Image 2026-10-09 at 10.51.28 PM.jpeg';
+import gallery2 from '../assets/WhatsApp Image 2026-10-09 at 10.51.27 PM.jpeg';
+import gallery3 from '../assets/WhatsApp Image 2026-10-09 at 10.51.28 PM (1).jpeg';
+import gallery4 from '../assets/WhatsApp Image 2026-10-09 at 11.03.23 PM.jpeg';
+import gallery5 from '../assets/WhatsApp Image 2026-10-09 at 10.51.29 PM.jpeg';
+import gallery6 from '../assets/WhatsApp Image 2026-10-09 at 11.01.37 PM.jpeg';
 
 const About = () => {
   return (
-    <div className="pt-32 pb-24 bg-brand-cream min-h-screen">
+    <div className="pt-40 pb-24 bg-brand-cream min-h-screen">
       <div className="max-w-full mx-auto px-6 sm:px-12 lg:px-20">
         
         {/* Page Header */}
@@ -135,9 +135,11 @@ const About = () => {
               className="rounded-2xl overflow-hidden border border-gray-100"
             >
               <img
-                src={jaggeryNew1}
-                alt="Our Products"
-                className="w-full h-80 object-cover"
+                src={gallery1}
+                alt="Mahaveer 100% pure sugarcane cane jaggery pack"
+                className="w-full aspect-[4/3] object-cover"
+                loading="lazy"
+                decoding="async"
               />
             </motion.div>
             <motion.div
@@ -148,9 +150,11 @@ const About = () => {
               className="rounded-2xl overflow-hidden border border-gray-100"
             >
               <img
-                src={jaggeryNew2}
-                alt="Our Process"
-                className="w-full h-80 object-cover"
+                src={gallery2}
+                alt="Health benefits of natural jaggery"
+                className="w-full aspect-[4/3] object-cover"
+                loading="lazy"
+                decoding="async"
               />
             </motion.div>
             <motion.div
@@ -161,9 +165,11 @@ const About = () => {
               className="rounded-2xl overflow-hidden border border-gray-100"
             >
               <img
-                src={jaggeryNew3}
-                alt="Our Quality"
-                className="w-full h-80 object-cover"
+                src={gallery3}
+                alt="Premium quality spices, pure flavours from the heart of India"
+                className="w-full aspect-[4/3] object-cover"
+                loading="lazy"
+                decoding="async"
               />
             </motion.div>
             <motion.div
@@ -174,9 +180,11 @@ const About = () => {
               className="rounded-2xl overflow-hidden border border-gray-100"
             >
               <img
-                src={jaggeryNew4}
-                alt="Our Products"
-                className="w-full h-80 object-cover"
+                src={gallery4}
+                alt="Health benefits of natural spices and grains"
+                className="w-full aspect-[4/3] object-cover"
+                loading="lazy"
+                decoding="async"
               />
             </motion.div>
             <motion.div
@@ -187,9 +195,11 @@ const About = () => {
               className="rounded-2xl overflow-hidden border border-gray-100"
             >
               <img
-                src={jaggeryNew5}
-                alt="Our Process"
-                className="w-full h-80 object-cover"
+                src={gallery5}
+                alt="Premium quality dry fruits"
+                className="w-full aspect-[4/3] object-cover"
+                loading="lazy"
+                decoding="async"
               />
             </motion.div>
             <motion.div
@@ -200,9 +210,11 @@ const About = () => {
               className="rounded-2xl overflow-hidden border border-gray-100"
             >
               <img
-                src={jaggeryNew6}
-                alt="Our Quality"
-                className="w-full h-80 object-cover"
+                src={gallery6}
+                alt="Health benefits of natural chia seeds"
+                className="w-full aspect-[4/3] object-cover"
+                loading="lazy"
+                decoding="async"
               />
             </motion.div>
           </div>

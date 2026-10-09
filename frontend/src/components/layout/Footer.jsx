@@ -86,7 +86,7 @@ const Footer = () => {
                                 <div className="bg-brand-brown/10 p-2.5 rounded-xl text-brand-brown">
                                     <MapPin size={20} />
                                 </div>
-                                <span>H.No. 4, Patrakar Colony, Link Road No. 3, Bhopal, Madhya Pradesh 462003</span>
+                                <span>Link Road No. 3, Kolar Road, Bhopal, Madhya Pradesh 462003</span>
                             </li>
                             <li className="flex items-center gap-4">
                                 <div className="bg-brand-brown/10 p-2.5 rounded-xl text-brand-brown">

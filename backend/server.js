@@ -5,9 +5,10 @@ const path = require('path');
 
 dotenv.config();
 
-const { connectDB, isDbConnected } = require('./config/db');
+const { connectDB, isDbConnected, pingDb } = require('./config/db');
 const { seedAdmin } = require('./scripts/seedAdmin');
 const productRoutes = require('./routes/productRoutes');
+const reviewRoutes = require('./routes/reviewRoutes');
 const paymentRoutes = require('./routes/paymentRoutes');
 const authRoutes = require('./routes/authRoutes');
 const contactRoutes = require('./routes/contactRoutes');
@@ -48,6 +49,7 @@ app.use(cors({
 
 // Keep the raw body around so the Razorpay webhook can verify its signature.
 app.use(express.json({
+    limit: '50mb',
     verify: (req, res, buf) => {
         req.rawBody = buf;
     },
@@ -56,11 +58,19 @@ app.use(express.json({
 // Serve uploaded images
 app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
 
-// Health check for uptime monitors / load balancers
-app.get('/api/health', (req, res) => {
-    res.json({ status: 'ok', db: isDbConnected() ? 'connected' : 'disconnected' });
+// Health check for uptime monitors / load balancers. Runs a real query rather
+// than trusting readyState, so a connected-but-unauthenticated mongod reports
+// unhealthy instead of "ok" while every route returns 500.
+app.get('/api/health', async (req, res) => {
+    try {
+        await pingDb();
+        res.json({ status: 'ok', db: 'connected' });
+    } catch (error) {
+        res.status(503).json({ status: 'degraded', db: 'unavailable', error: error.message });
+    }
 });
 
+app.use('/api/products/:productId/reviews', reviewRoutes);
 app.use('/api/products', productRoutes);
 app.use('/api/payment', paymentRoutes);
 app.use('/api/auth', authRoutes);

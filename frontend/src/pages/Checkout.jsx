@@ -8,19 +8,26 @@ import api, { API_BASE_URL } from '../lib/api';
 import jaggery1 from '../assets/jaggery1.jpeg';
 import jaggery2 from '../assets/jaggery2.jpeg';
 import jaggery3 from '../assets/jaggery3.jpeg';
+import { optimizeCloudinaryUrl } from '../lib/image';
 
 const getProductImage = (imagePath) => {
     if (!imagePath) return jaggery1;
-    if (imagePath.startsWith('http')) return imagePath;
+    if (imagePath.startsWith('http')) return optimizeCloudinaryUrl(imagePath, 150);
     if (imagePath.startsWith('/uploads')) return `${API_BASE_URL}${imagePath}`;
     return imagePath;
 };
 
 const Checkout = () => {
-  const { cartItems, totalPrice, clearCart } = useCart();
-  const { user } = useAuth();
+  const { cartItems, totalPrice, gstTotal, shippingCharge, grandTotal, clearCart } = useCart();
+  const { user, loading: authLoading } = useAuth();
   const navigate = useNavigate();
-  
+
+  useEffect(() => {
+    if (!authLoading && !user) {
+      navigate('/login', { replace: true, state: { from: '/checkout' } });
+    }
+  }, [authLoading, user, navigate]);
+
   const [formData, setFormData] = useState({
     name: '',
     email: '',
@@ -152,6 +159,11 @@ const Checkout = () => {
             
             rzp.on('payment.failed', function (response) {
                 console.error('Payment failed:', response);
+                // Let the server email the customer about the failure.
+                // It double-checks with Razorpay, and only notifies once per order.
+                api.post('/api/payment/failed', {
+                    razorpay_order_id: response.error?.metadata?.order_id || order.id,
+                }).catch(() => {});
                 alert('Payment failed. Please try again.');
                 setIsProcessing(false);
             });
@@ -165,11 +177,19 @@ const Checkout = () => {
         }
     };
 
+    if (authLoading || !user) {
+        return (
+            <div className="pt-40 pb-20 bg-brand-cream min-h-screen flex items-center justify-center">
+                <div className="w-12 h-12 border-4 border-brand-light border-t-brand-brown rounded-full animate-spin" />
+            </div>
+        );
+    }
+
     if (paymentSuccess) {
         return (
-            <div className="pt-28 pb-20 bg-brand-cream min-h-screen flex items-center justify-center">
+            <div className="pt-40 pb-20 bg-brand-cream min-h-screen flex items-center justify-center">
                 <div className="max-w-lg mx-auto px-4 text-center">
-                    <motion.div 
+                    <motion.div
                         initial={{ scale: 0 }}
                         animate={{ scale: 1 }}
                         className="w-24 h-24 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-6"
@@ -193,7 +213,7 @@ const Checkout = () => {
 
     if (cartItems.length === 0) {
         return (
-            <div className="pt-28 pb-20 bg-brand-cream min-h-screen flex items-center justify-center">
+            <div className="pt-40 pb-20 bg-brand-cream min-h-screen flex items-center justify-center">
                 <div className="max-w-lg mx-auto px-4 text-center">
                     <ShoppingBag size={48} className="text-gray-300 mx-auto mb-6" />
                     <h1 className="text-2xl font-bold text-gray-900 mb-3">Your cart is empty</h1>
@@ -209,7 +229,7 @@ const Checkout = () => {
     }
 
     return (
-        <div className="pt-28 pb-20 bg-brand-cream min-h-screen">
+        <div className="pt-40 pb-20 bg-brand-cream min-h-screen">
             <div className="max-w-full mx-auto px-6 sm:px-12 lg:px-20">
                 <Link to="/cart" className="inline-flex items-center gap-2 text-brand-brown font-semibold mb-6 hover:underline">
                     <ArrowLeft size={18} /> Back to Cart
@@ -330,7 +350,7 @@ const Checkout = () => {
                                     className="w-full bg-brand-brown text-white py-4 rounded-xl font-bold text-lg flex items-center justify-center gap-2 hover:bg-brand-darkBrown transition-all shadow-lg shadow-brand-light disabled:opacity-50"
                                 >
                                     <CreditCard size={20} />
-                                    {isProcessing ? 'Processing...' : `Pay ₹${Number(totalPrice).toFixed(2)}`}
+                                    {isProcessing ? 'Processing...' : `Pay ₹${Number(grandTotal).toFixed(2)}`}
                                 </button>
                             </form>
                         </motion.div>
@@ -349,10 +369,12 @@ const Checkout = () => {
                             <div className="space-y-4 mb-6 relative z-10">
                                 {cartItems.map(item => (
                                     <div key={item._id} className="flex items-center gap-3">
-                                        <img 
-                                            src={getProductImage(item.image)} 
-                                            alt={item.name} 
+                                        <img
+                                            src={getProductImage(item.image)}
+                                            alt={item.name}
                                             className="w-14 h-14 rounded-xl object-cover"
+                                            loading="lazy"
+                                            decoding="async"
                                         />
                                         <div className="flex-grow">
                                             <p className="font-bold text-sm text-white">{item.name}</p>
@@ -369,15 +391,19 @@ const Checkout = () => {
                                     <span className="text-white">₹{Number(totalPrice).toFixed(2)}</span>
                                 </div>
                                 <div className="flex justify-between text-brand-cream font-semibold text-sm mb-2">
+                                    <span>GST</span>
+                                    <span className="text-white">₹{Number(gstTotal).toFixed(2)}</span>
+                                </div>
+                                <div className="flex justify-between text-brand-cream font-semibold text-sm mb-2">
                                     <span>Shipping</span>
-                                    <span className="text-white font-bold uppercase tracking-widest text-[10px]">Free</span>
+                                    <span className="text-white">₹{Number(shippingCharge).toFixed(2)}</span>
                                 </div>
                             </div>
                             
                             <div className="border-t border-white/20 pt-5 relative z-10">
                                 <div className="flex justify-between items-end">
                                     <span className="text-brand-cream font-semibold text-sm">Grand Total</span>
-                                    <span className="text-3xl font-black text-brand-cream">₹{Number(totalPrice).toFixed(2)}</span>
+                                    <span className="text-3xl font-black text-brand-cream">₹{Number(grandTotal).toFixed(2)}</span>
                                 </div>
                             </div>
                         </motion.div>

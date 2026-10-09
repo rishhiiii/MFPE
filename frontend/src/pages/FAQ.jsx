@@ -50,7 +50,7 @@ const FAQ = () => {
   ]
 
   return (
-    <div className="pt-32 pb-24 bg-brand-cream min-h-screen">
+    <div className="pt-40 pb-24 bg-brand-cream min-h-screen">
       <div className="max-w-full mx-auto px-6 sm:px-12 lg:px-20">
         <div className="max-w-4xl mx-auto text-center mb-24">
           <motion.h1

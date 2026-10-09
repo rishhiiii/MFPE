@@ -52,7 +52,7 @@ const Shop = () => {
     }, [activeCategory, searchQuery, products]);
 
     return (
-        <div className="pt-28 pb-20 bg-brand-cream min-h-screen">
+        <div className="pt-40 pb-20 bg-brand-cream min-h-screen">
             <div className="max-w-full mx-auto px-6 sm:px-12 lg:px-20">
                 {/* Page Header */}
                 <div className="text-center mb-10 pt-4">

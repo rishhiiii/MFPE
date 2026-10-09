@@ -30,7 +30,7 @@ export const SITE = {
   email: 'mahaveermfpe@gmail.com',
   whatsapp: '919669993888',
   address: {
-    street: 'H.No. 4, Patrakar Colony, Link Road No. 3',
+    street: 'Link Road No. 3, Kolar Road',
     locality: 'Bhopal',
     region: 'Madhya Pradesh',
     postalCode: '462003',
@@ -88,8 +88,8 @@ export const ROUTE_SEO = {
   '/blog': {
     title: 'Blog',
     description:
-      'Insights, recipes and news on organic jaggery, natural sweeteners, healthy eating and the food export industry from Mahaveer Food Products.',
-    keywords: ['jaggery benefits', 'organic food blog', 'healthy eating'],
+      'Jaggery recipes, kitchen guides and stories from Mahaveer Food Products: gur wali chai, peanut chikki, til gud ladoo, how to store and identify pure jaggery, and more.',
+    keywords: ['jaggery recipes', 'jaggery benefits', 'gur recipes', 'how to store jaggery', 'organic food blog'],
   },
   '/services': {
     title: 'Our Services',
@@ -117,6 +117,7 @@ export const ROUTE_SEO = {
   '/cart': { title: 'Your Cart', noindex: true },
   '/wishlist': { title: 'Your Wishlist', noindex: true },
   '/checkout': { title: 'Checkout', noindex: true },
+  '/profile': { title: 'My Account', noindex: true },
   '/login': { title: 'Login', noindex: true },
   '/signup': { title: 'Create Account', noindex: true },
   '/admin': { title: 'Admin', noindex: true },

@@ -1,6 +1,7 @@
 const express = require('express');
 const router = express.Router();
 const Product = require('../models/Product');
+const Review = require('../models/Review');
 const { isDbConnected } = require('../config/db');
 const upload = require('../config/multer');
 const { uploadToCloudinary } = require('../config/cloudinary');
@@ -19,12 +20,28 @@ const requireDb = (res) => {
   return true;
 };
 
+const round2 = (n) => Math.round((n + Number.EPSILON) * 100) / 100;
+
+// MRP + discount are the inputs an admin actually thinks in; `price` is what the
+// rest of the app charges. When an MRP is given we derive the price from it so
+// the displayed saving is always arithmetically true. Products saved the old way
+// (price only, no MRP) keep working untouched.
+const derivePricing = (payload) => {
+  const mrp = Number(payload.mrp) || 0;
+  if (mrp <= 0) {
+    return { mrp: 0, discount: 0, price: round2(Number(payload.price) || 0) };
+  }
+  const discount = Math.min(100, Math.max(0, Number(payload.discount) || 0));
+  return { mrp: round2(mrp), discount, price: round2(mrp * (1 - discount / 100)) };
+};
+
 const normalizeProductPayload = (payload) => ({
   name: payload.name?.trim() || '',
   description: payload.description?.trim() || '',
   category: payload.category?.trim() || '',
   image: (typeof payload.image === 'string') ? payload.image.trim() : '',
-  price: Number(payload.price) || 0,
+  ...derivePricing(payload),
+  gstRate: Math.min(100, Math.max(0, Number(payload.gstRate) || 0)),
   stock: Number(payload.stock) || 0,
   ingredients: payload.ingredients?.trim() || '',
   shelfLife: payload.shelfLife?.trim() || '',
@@ -170,6 +187,7 @@ router.delete('/:id', protect, admin, async (req, res) => {
     if (!deletedProduct) {
       return res.status(404).json({ message: 'Product not found' });
     }
+    await Review.deleteMany({ product: deletedProduct._id });
     res.json({ message: 'Product deleted successfully' });
   } catch (error) {
     res.status(500).json({ message: error.message || 'Unable to delete product' });

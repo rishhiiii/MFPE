@@ -37,4 +37,20 @@ const admin = (req, res, next) => {
   return res.status(403).json({ message: 'Admin access required' });
 };
 
-module.exports = { protect, admin };
+// optionalAuth: like protect, but never rejects. Sets req.user when a valid
+// token is present (e.g. to link a checkout to the logged-in account) and
+// otherwise just continues as a guest request.
+const optionalAuth = async (req, res, next) => {
+  const authHeader = req.headers.authorization || '';
+  if (authHeader.startsWith('Bearer ')) {
+    try {
+      const decoded = jwt.verify(authHeader.split(' ')[1], process.env.JWT_SECRET);
+      req.user = await User.findById(decoded.id).select('-password');
+    } catch {
+      // not one of our tokens (or expired): treat as a guest
+    }
+  }
+  return next();
+};
+
+module.exports = { protect, admin, optionalAuth };

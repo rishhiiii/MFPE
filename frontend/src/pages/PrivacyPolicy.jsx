@@ -25,7 +25,7 @@ const PrivacyPolicy = () => {
             'Personal details you provide, such as your name, mobile number, email address, and shipping/billing address;',
             'Order history, including the products you purchase and your transaction records;',
             'Payment details, processed securely through our payment gateway (see “Payment Information” below);',
-            'Account details if you register or sign in (including through Google Sign-In via Firebase Authentication);',
+            'Account details if you register or sign in (including through Sign in with Google, which shares your name, email address and profile picture with us);',
             'Device and browser information, such as your IP address, browser type, and device details, collected automatically as you browse.',
           ]}
         />

@@ -6,7 +6,9 @@ const mongoose = require('mongoose');
 const Order = require('../models/Order');
 const Product = require('../models/Product');
 const { isDbConnected } = require('../config/db');
-const { protect, admin } = require('../middleware/authMiddleware');
+const { protect, admin, optionalAuth } = require('../middleware/authMiddleware');
+const { notifyOrderConfirmed, notifyPaymentFailed, notifyOrderStatus } = require('../utils/orderNotifications');
+const { escapeRegex } = require('../utils/regexEscape');
 
 const keyId = process.env.RAZORPAY_KEY_ID;
 const keySecret = process.env.RAZORPAY_KEY_SECRET;
@@ -27,6 +29,10 @@ const validateShippingAddress = (address = {}) => {
     return missing;
 };
 
+// Flat shipping charge (₹) added once per order. Keep in sync with
+// SHIPPING_CHARGE in frontend/src/context/CartContext.jsx.
+const SHIPPING_CHARGE = 30;
+
 // Recompute the authoritative order total from the database. The client only
 // sends product ids + quantities; prices, names and images always come from the
 // DB so the amount can never be tampered with in the browser.
@@ -37,6 +43,7 @@ const buildOrderFromItems = async (items) => {
 
     const orderItems = [];
     let totalPrice = 0;
+    let taxTotal = 0;
 
     for (const item of items) {
         const productId = item.product || item._id;
@@ -57,23 +64,31 @@ const buildOrderFromItems = async (items) => {
             throw new Error(`Insufficient stock for ${product.name}`);
         }
 
+        const gstRate = Number(product.gstRate) || 0;
         totalPrice += product.price * qty;
+        taxTotal += (product.price * qty * gstRate) / 100;
         orderItems.push({
             name: product.name,
             qty,
             image: product.image || '',
             price: product.price,
+            gstRate,
             product: product._id,
         });
     }
 
     // Round to 2 decimals to avoid floating point noise in the amount.
-    totalPrice = Math.round(totalPrice * 100) / 100;
-    return { orderItems, totalPrice };
+    // GST is added on top of the selling price, per product rate. Keep in sync
+    // with the totals in frontend/src/context/CartContext.jsx.
+    const itemsPrice = Math.round(totalPrice * 100) / 100;
+    const taxPrice = Math.round(taxTotal * 100) / 100;
+    const shippingPrice = SHIPPING_CHARGE;
+    totalPrice = Math.round((itemsPrice + taxPrice + shippingPrice) * 100) / 100;
+    return { orderItems, itemsPrice, taxPrice, shippingPrice, totalPrice };
 };
 
 // Create Razorpay order (server computes the amount + saves a pending order)
-router.post('/order', async (req, res) => {
+router.post('/order', optionalAuth, async (req, res) => {
     const { items, shippingAddress } = req.body;
 
     if (!isDbConnected()) {
@@ -86,7 +101,7 @@ router.post('/order', async (req, res) => {
     }
 
     try {
-        const { orderItems, totalPrice } = await buildOrderFromItems(items);
+        const { orderItems, itemsPrice, taxPrice, shippingPrice, totalPrice } = await buildOrderFromItems(items);
 
         const amountInPaise = Math.round(totalPrice * 100);
         if (amountInPaise < 100) {
@@ -101,6 +116,7 @@ router.post('/order', async (req, res) => {
 
         // Persist a pending order so /verify never has to trust a client amount.
         await Order.create({
+            user: req.user?._id,
             shippingAddress: {
                 name: shippingAddress.name,
                 phone: shippingAddress.phone,
@@ -112,6 +128,9 @@ router.post('/order', async (req, res) => {
                 country: shippingAddress.country || 'India',
             },
             orderItems,
+            itemsPrice,
+            taxPrice,
+            shippingPrice,
             totalPrice,
             isPaid: false,
             razorpayOrderId: rzpOrder.id,
@@ -163,7 +182,22 @@ const finalizeOrder = async (razorpayOrderId, razorpayPaymentId, razorpaySignatu
         })
     );
 
+    // Email the customer and the store. Runs in the background so a slow mail
+    // server never delays the payment response; it de-duplicates itself.
+    notifyOrderConfirmed(order._id).catch((err) =>
+        console.error('[notify] confirmation error:', err.message)
+    );
+
     return { found: true, order, alreadyPaid: false };
+};
+
+// Confirm with Razorpay that an order really has a failed payment (and nothing
+// paid) before telling the customer, so this can't be triggered with a guessed id.
+const confirmFailedWithRazorpay = async (razorpayOrderId) => {
+    const { items = [] } = await razorpay.orders.fetchPayments(razorpayOrderId);
+    if (items.some((p) => p.status === 'captured' || p.status === 'authorized')) return null;
+    const failed = items.filter((p) => p.status === 'failed').sort((a, b) => b.created_at - a.created_at)[0];
+    return failed ? { reason: failed.error_description || '' } : null;
 };
 
 // Verify payment signature and finalize the previously created pending order.
@@ -209,9 +243,32 @@ router.post('/verify', async (req, res) => {
     }
 });
 
+// Called by the checkout page when Razorpay reports a failed payment. Emails the
+// customer that the payment failed (once per order).
+router.post('/failed', async (req, res) => {
+    const { razorpay_order_id } = req.body || {};
+    if (!razorpay_order_id || typeof razorpay_order_id !== 'string') {
+        return res.status(400).json({ received: false });
+    }
+    try {
+        if (!isDbConnected()) return res.status(503).json({ received: false });
+        const failed = await confirmFailedWithRazorpay(razorpay_order_id);
+        if (failed) {
+            notifyPaymentFailed(razorpay_order_id, failed.reason).catch((err) =>
+                console.error('[notify] payment-failed error:', err.message)
+            );
+        }
+        res.json({ received: true });
+    } catch (error) {
+        console.error('Error handling failed payment:', error.message);
+        res.status(500).json({ received: false });
+    }
+});
+
 // Razorpay webhook backstop: finalizes an order even if the customer's browser
 // closes before /verify runs. Configure this URL + secret in the Razorpay
-// dashboard (Settings > Webhooks) and subscribe to the `payment.captured` event.
+// dashboard (Settings > Webhooks) and subscribe to the `payment.captured` and
+// `payment.failed` events.
 // NOTE: this route needs the raw request body (see req.rawBody in server.js).
 router.post('/webhook', async (req, res) => {
     const webhookSecret = process.env.RAZORPAY_WEBHOOK_SECRET;
@@ -251,12 +308,38 @@ router.post('/webhook', async (req, res) => {
             if (result.found && !result.alreadyPaid) {
                 console.log(`Order finalized via webhook: ${payment.order_id}`);
             }
+        } else if (event === 'payment.failed' && payment?.order_id && isDbConnected()) {
+            // Backstop for the checkout page's /failed call (e.g. browser closed).
+            const failed = await confirmFailedWithRazorpay(payment.order_id);
+            if (failed) await notifyPaymentFailed(payment.order_id, payment.error_description || failed.reason);
         }
     } catch (error) {
         console.error('Error handling webhook:', error.message);
     }
 
     res.json({ received: true });
+});
+
+// Paid orders of the logged-in customer, newest first. Matches orders linked to
+// the account and, for orders placed before that link existed, orders whose
+// shipping email is the account's email.
+router.get('/my-orders', protect, async (req, res) => {
+    try {
+        if (!isDbConnected()) {
+            return res.status(503).json({ message: 'Database is unavailable' });
+        }
+        const emailRegex = new RegExp(`^${escapeRegex(req.user.email)}$`, 'i');
+        const orders = await Order.find({
+            isPaid: true,
+            $or: [{ user: req.user._id }, { 'shippingAddress.email': emailRegex }],
+        })
+            .select('-razorpaySignature -paymentResult')
+            .sort({ createdAt: -1 });
+        res.json(orders);
+    } catch (error) {
+        console.error('Error fetching customer orders:', error.message);
+        res.status(500).json({ message: 'Unable to fetch your orders' });
+    }
 });
 
 // Get all orders (for admin)
@@ -292,9 +375,20 @@ router.patch('/orders/:id', protect, admin, async (req, res) => {
             return res.status(404).json({ message: 'Order not found' });
         }
 
+        const previousStatus = order.status;
+        const previousTracking = order.trackingNumber || '';
         if (status !== undefined) order.status = status;
         if (trackingNumber !== undefined) order.trackingNumber = String(trackingNumber).trim();
         await order.save();
+
+        // Let the customer know (in the background; never blocks the admin).
+        const statusChanged = order.status !== previousStatus;
+        const trackingAdded = Boolean(order.trackingNumber) && order.trackingNumber !== previousTracking;
+        if (statusChanged || trackingAdded) {
+            notifyOrderStatus(order, { statusChanged, trackingAdded }).catch((err) =>
+                console.error('[notify] status email error:', err.message)
+            );
+        }
 
         res.json(order);
     } catch (error) {

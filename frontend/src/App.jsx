@@ -6,12 +6,14 @@ import Home from './pages/Home';
 import Shop from './pages/Shop';
 import Cart from './pages/Cart';
 import Wishlist from './pages/Wishlist';
+import Profile from './pages/Profile';
 import ProductDetail from './pages/ProductDetail';
 import About from './pages/About';
 import Contact from './pages/Contact';
 import Export from './pages/Export';
 import Wholesale from './pages/Wholesale';
 import Blog from './pages/Blog';
+import BlogPost from './pages/BlogPost';
 import Services from './pages/Services';
 import Checkout from './pages/Checkout';
 import Login from './pages/Login';
@@ -60,8 +62,10 @@ function App() {
                   <Route path="/export" element={<Export />} />
                   <Route path="/wholesale" element={<Wholesale />} />
                   <Route path="/blog" element={<Blog />} />
+                  <Route path="/blog/:slug" element={<BlogPost />} />
                   <Route path="/services" element={<Services />} />
                   <Route path="/wishlist" element={<Wishlist />} />
+                  <Route path="/profile" element={<Profile />} />
                   <Route path="/login" element={<Login />} />
                   <Route path="/signup" element={<Signup />} />
                   <Route

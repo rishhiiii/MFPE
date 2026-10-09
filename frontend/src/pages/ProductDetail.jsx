@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useCallback, useEffect, useState } from 'react';
 import { Link, useParams, useNavigate } from 'react-router-dom';
 import api, { API_BASE_URL } from '../lib/api';
 import { motion, AnimatePresence } from 'framer-motion';
@@ -19,14 +19,17 @@ import {
 } from 'lucide-react';
 import { useCart } from '../context/CartContext';
 import Seo from '../components/seo/Seo';
+import ProductReviews from '../components/product/ProductReviews';
+import { StarDisplay } from '../components/product/StarRating';
 import { SITE, absoluteUrl } from '../lib/seoConfig';
 import jaggery1 from '../assets/jaggery1.jpeg';
 import jaggery2 from '../assets/jaggery2.jpeg';
 import jaggery3 from '../assets/jaggery3.jpeg';
+import { optimizeCloudinaryUrl } from '../lib/image';
 
 const getProductImage = (imagePath) => {
     if (!imagePath) return jaggery1;
-    if (imagePath.startsWith('http')) return imagePath;
+    if (imagePath.startsWith('http')) return optimizeCloudinaryUrl(imagePath, 900);
     if (imagePath.startsWith('/uploads')) return `${API_BASE_URL}${imagePath}`;
     return imagePath;
 };
@@ -39,6 +42,18 @@ const ProductDetail = () => {
     const [loading, setLoading] = useState(true);
     const [quantity, setQuantity] = useState(1);
     const [activeTab, setActiveTab] = useState('description');
+
+    // Reviews tab reports the latest average/count so the header stays in sync.
+    const handleReviewSummary = useCallback((summary) => {
+        setProduct((p) => (p && (p.rating !== summary.average || p.numReviews !== summary.count)
+            ? { ...p, rating: summary.average, numReviews: summary.count }
+            : p));
+    }, []);
+
+    const openReviews = () => {
+        setActiveTab('reviews');
+        document.getElementById('product-tabs')?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    };
 
     useEffect(() => {
         window.scrollTo(0, 0);
@@ -97,6 +112,15 @@ const ProductDetail = () => {
                 availability: 'https://schema.org/InStock',
                 seller: { '@type': 'Organization', name: SITE.name },
             },
+            ...(product.numReviews > 0 && {
+                aggregateRating: {
+                    '@type': 'AggregateRating',
+                    ratingValue: Number(product.rating).toFixed(1),
+                    reviewCount: product.numReviews,
+                    bestRating: 5,
+                    worstRating: 1,
+                },
+            }),
         },
         {
             '@context': 'https://schema.org',
@@ -110,7 +134,7 @@ const ProductDetail = () => {
     ];
 
     return (
-        <div className="pt-20 pb-16 bg-brand-cream">
+        <div className="pt-40 pb-16 bg-brand-cream">
             <Seo
                 title={product.name}
                 description={productDescription}
@@ -137,10 +161,11 @@ const ProductDetail = () => {
                         className="relative"
                     >
                         <div className="aspect-[4/3] rounded-[2rem] overflow-hidden bg-brand-cream shadow-2xl shadow-gray-100 group">
-                            <img 
-                                src={getProductImage(product.image)} 
-                                alt={product.name} 
-                                className="w-full h-full object-cover transition-transform duration-1000 group-hover:scale-105" 
+                            <img
+                                src={getProductImage(product.image)}
+                                alt={product.name}
+                                className="w-full h-full object-cover transition-transform duration-1000 group-hover:scale-105"
+                                decoding="async"
                             />
 
 
@@ -172,15 +197,38 @@ const ProductDetail = () => {
                             initial={{ opacity: 0, x: 20 }}
                             animate={{ opacity: 1, x: 0 }}
                         >
-                            <h1 className="text-3xl md:text-5xl font-black text-gray-900 tracking-tighter mb-6 leading-tight">
+                            <h1 className="text-3xl md:text-5xl font-black text-gray-900 tracking-tighter mb-3 leading-tight">
                                 {product.name}
                             </h1>
+                            <button type="button" onClick={openReviews} className="mb-6 inline-flex items-center gap-2 text-sm text-gray-600 hover:text-[#8B4513]">
+                                {product.numReviews > 0 ? (
+                                    <>
+                                        <StarDisplay value={product.rating} size={18} />
+                                        <span className="font-semibold text-gray-900">{Number(product.rating).toFixed(1)}</span>
+                                        <span className="underline underline-offset-2">({product.numReviews} review{product.numReviews === 1 ? '' : 's'})</span>
+                                    </>
+                                ) : (
+                                    <>
+                                        <StarDisplay value={0} size={18} />
+                                        <span className="underline underline-offset-2">Be the first to review</span>
+                                    </>
+                                )}
+                            </button>
 
                             <div className="flex items-baseline gap-4 mb-6">
                                 <span className="text-4xl font-black text-gray-900">₹{Number(product.price).toFixed(2)}</span>
-                                <span className="text-2xl text-gray-300 line-through font-bold">₹{Math.round(product.price * 1.3).toFixed(2)}</span>
-                                <span className="bg-brand-brown text-white px-3 py-1.5 rounded-xl font-black text-xs uppercase tracking-widest shadow-lg shadow-brand-light">Save 30%</span>
+                                {product.mrp > product.price && (
+                                    <>
+                                        <span className="text-2xl text-gray-300 line-through font-bold">₹{Number(product.mrp).toFixed(2)}</span>
+                                        <span className="self-center bg-[#8B4513] text-[#FFF8DC] px-3 py-1.5 rounded-xl font-black text-xs uppercase tracking-widest shadow-md">
+                                            {Math.round((1 - product.price / product.mrp) * 100)}% OFF
+                                        </span>
+                                    </>
+                                )}
                             </div>
+                            {product.gstRate > 0 && (
+                                <p className="-mt-4 mb-6 text-sm text-gray-500">+ {product.gstRate}% GST, added at checkout</p>
+                            )}
 
                             <p className="text-base text-gray-600 font-medium leading-relaxed max-w-xl">
                                 {product.description}
@@ -234,15 +282,15 @@ const ProductDetail = () => {
                 </div>
 
                 {/* Tabs Section */}
-                <div className="mt-20">
-                    <div className="flex gap-8 border-b border-brand-brown/10 mb-8">
+                <div id="product-tabs" className="mt-20 scroll-mt-32">
+                    <div className="flex gap-5 sm:gap-8 overflow-x-auto border-b border-brand-brown/10 mb-8">
                         {['description', 'specifications', 'reviews'].map((tab) => (
                             <button
                                 key={tab}
                                 onClick={() => setActiveTab(tab)}
-                                className={`pb-4 text-sm font-black uppercase tracking-widest relative transition-colors ${activeTab === tab ? 'text-gray-900' : 'text-gray-400 hover:text-gray-600'}`}
+                                className={`pb-4 whitespace-nowrap flex-shrink-0 text-xs sm:text-sm font-black uppercase tracking-wider sm:tracking-widest relative transition-colors ${activeTab === tab ? 'text-gray-900' : 'text-gray-400 hover:text-gray-600'}`}
                             >
-                                {tab}
+                                {tab}{tab === 'reviews' && product.numReviews > 0 ? ` (${product.numReviews})` : ''}
                                 {activeTab === tab && (
                                     <motion.div layoutId="tabLine" className="absolute bottom-0 left-0 right-0 h-1 bg-brand-brown rounded-full" />
                                 )}
@@ -333,11 +381,12 @@ const ProductDetail = () => {
                                     initial={{ opacity: 0, y: 10 }}
                                     animate={{ opacity: 1, y: 0 }}
                                     exit={{ opacity: 0, y: -10 }}
-                                    className="text-center py-12"
                                 >
-                                    <p className="text-gray-500 font-medium">
-                                        No reviews yet. Be the first to share your experience with {product?.name}.
-                                    </p>
+                                    <ProductReviews
+                                        productId={product._id}
+                                        productName={product.name}
+                                        onSummaryChange={handleReviewSummary}
+                                    />
                                 </motion.div>
                             )}
                         </AnimatePresence>

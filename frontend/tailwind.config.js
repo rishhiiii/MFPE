@@ -7,9 +7,10 @@ export default {
   theme: {
     extend: {
       fontFamily: {
-        sans: ['"Playfair Display"', '"Georgia"', 'serif'],
-        heading: ['"Playfair Display"', '"Georgia"', 'serif'],
-        body: ['"Lora"', '"Georgia"', 'serif'],
+        sans: ['"Poppins"', '"Helvetica Neue"', 'Arial', 'sans-serif'],
+        heading: ['"Poppins"', '"Helvetica Neue"', 'Arial', 'sans-serif'],
+        body: ['"Poppins"', '"Helvetica Neue"', 'Arial', 'sans-serif'],
+        logo: ['"Poppins"', '"Helvetica Neue"', 'Arial', 'sans-serif'],
       },
       colors: {
         brand: {

@@ -1,4 +1,19 @@
 @import "tailwindcss";
+/* Tailwind v4 doesn't read theme.extend.colors from a JS config by default —
+   this repo's tailwind.config.js defines the brand-* palette, but without this
+   line every `bg-brand-*` / `text-brand-*` / `border-brand-*` / `shadow-brand-*`
+   utility across the whole app silently generated no CSS at all. */
+@config "../tailwind.config.js";
+
+/* Hide scrollbars everywhere */
+* {
+  -ms-overflow-style: none;  /* IE and Edge */
+  scrollbar-width: none;  /* Firefox */
+}
+
+*::-webkit-scrollbar {
+  display: none;  /* Chrome, Safari, Opera */
+}
 
 body {
   margin: 0;

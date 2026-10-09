@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { Plus, Pencil, Trash2, X, Search, ImageIcon } from 'lucide-react';
 import api, { API_BASE_URL } from '../../lib/api';
+import { optimizeCloudinaryUrl } from '../../lib/image';
 import jaggery1 from '../../assets/jaggery1.jpeg';
 
 // Categories the storefront (Shop.jsx) filters by — offered as suggestions so
@@ -11,13 +12,22 @@ const CATEGORY_SUGGESTIONS = [
 ];
 
 const EMPTY_FORM = {
-  name: '', description: '', category: '', price: '', stock: '',
+  name: '', description: '', category: '', price: '', mrp: '', discount: '', gstRate: '', stock: '',
   ingredients: '', shelfLife: '', weight: '', storage: '', origin: '', packaging: '',
+};
+
+// Mirrors derivePricing() on the server so the admin sees the exact selling
+// price that will be saved. An MRP, when given, wins over a typed price.
+const sellingPrice = ({ mrp, discount, price }) => {
+  const m = Number(mrp) || 0;
+  if (m <= 0) return Number(price) || 0;
+  const d = Math.min(100, Math.max(0, Number(discount) || 0));
+  return Math.round(m * (1 - d / 100) * 100) / 100;
 };
 
 const productImage = (path) => {
   if (!path) return jaggery1;
-  if (path.startsWith('http')) return path;
+  if (path.startsWith('http')) return optimizeCloudinaryUrl(path, 200);
   if (path.startsWith('/uploads')) return `${API_BASE_URL}${path}`;
   return path;
 };
@@ -65,7 +75,8 @@ const AdminProducts = ({ products, onRefresh }) => {
     setEditingId(p._id);
     setForm({
       name: p.name || '', description: p.description || '', category: p.category || '',
-      price: p.price ?? '', stock: p.stock ?? '', ingredients: p.ingredients || '',
+      price: p.price ?? '', mrp: p.mrp || '', discount: p.discount || '', gstRate: p.gstRate ?? '',
+      stock: p.stock ?? '', ingredients: p.ingredients || '',
       shelfLife: p.shelfLife || '', weight: p.weight || '', storage: p.storage || '',
       origin: p.origin || '', packaging: p.packaging || '',
     });
@@ -105,13 +116,17 @@ const AdminProducts = ({ products, onRefresh }) => {
     e.preventDefault();
     setFormError('');
 
-    if (!form.name.trim() || !form.description.trim() || !form.category.trim() || !(Number(form.price) > 0)) {
+    if (!form.name.trim() || !form.description.trim() || !form.category.trim() || !(sellingPrice(form) > 0)) {
       setFormError('Name, description, category and a price greater than 0 are required.');
       return;
     }
 
     const fd = new FormData();
     Object.entries(form).forEach(([k, v]) => fd.append(k, v));
+    // Always send the resolved selling price. The Price input is hidden when an
+    // MRP is entered, so form.price would otherwise go out empty, and a backend
+    // that doesn't derive price from mrp/discount would reject it with a 400.
+    fd.set('price', sellingPrice(form).toFixed(2));
     if (imageFile) fd.append('image', imageFile);
 
     setSubmitting(true);
@@ -199,7 +214,14 @@ const AdminProducts = ({ products, onRefresh }) => {
                       </div>
                     </td>
                     <td className="px-4 py-3 text-gray-600">{p.category || '—'}</td>
-                    <td className="px-4 py-3 font-bold text-gray-900">₹{Number(p.price).toLocaleString('en-IN')}</td>
+                    <td className="px-4 py-3 font-bold text-gray-900">
+                      ₹{Number(p.price).toLocaleString('en-IN')}
+                      {p.mrp > p.price && (
+                        <span className="ml-1.5 text-xs font-bold text-gray-400 line-through">
+                          ₹{Number(p.mrp).toLocaleString('en-IN')}
+                        </span>
+                      )}
+                    </td>
                     <td className="px-4 py-3">
                       <span className={`px-2 py-1 rounded-full text-xs font-bold ${
                         (p.stock ?? 0) <= 0 ? 'bg-red-100 text-red-700'
@@ -238,18 +260,18 @@ const AdminProducts = ({ products, onRefresh }) => {
 
       {/* Add / Edit modal */}
       {showForm && (
-        <div className="fixed inset-0 z-[200] flex items-start sm:items-center justify-center p-4 bg-black/50 overflow-y-auto">
-          <div className="bg-white rounded-2xl w-full max-w-2xl my-8 border border-gray-200">
-            <div className="flex items-center justify-between px-6 py-4 border-b border-gray-100 sticky top-0 bg-white rounded-t-2xl">
+        <div className="fixed inset-0 z-[200] flex items-start justify-center p-4 bg-black/50 overflow-y-auto">
+          <div className="bg-white rounded-2xl w-full max-w-2xl my-4 sm:my-8 border border-gray-200 shadow-2xl">
+            <div className="flex items-center justify-between px-6 py-4 border-b border-gray-100 sticky top-0 bg-white rounded-t-2xl z-10">
               <h3 className="text-lg font-black text-gray-900">
                 {editingId ? 'Edit Product' : 'Add New Product'}
               </h3>
-              <button onClick={closeForm} className="p-2 rounded-lg hover:bg-gray-100 text-gray-500">
+              <button onClick={closeForm} className="p-2 rounded-lg hover:bg-gray-100 text-gray-500 transition-colors">
                 <X size={20} />
               </button>
             </div>
 
-            <form onSubmit={handleSubmit} className="p-6 space-y-4">
+            <form onSubmit={handleSubmit} className="p-6 space-y-4 max-h-[80vh] overflow-y-auto">
               {formError && (
                 <div className="bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded-xl text-sm font-medium">
                   {formError}
@@ -257,19 +279,25 @@ const AdminProducts = ({ products, onRefresh }) => {
               )}
 
               {/* Image picker */}
-              <div className="flex items-center gap-4">
-                <div className="w-20 h-20 rounded-xl border border-gray-200 bg-gray-50 overflow-hidden flex items-center justify-center shrink-0">
+              <div className="flex flex-col sm:flex-row items-start sm:items-center gap-4 p-4 border border-dashed border-gray-300 rounded-xl bg-gray-50">
+                <div className="w-24 h-24 rounded-xl border border-gray-300 bg-white overflow-hidden flex items-center justify-center shrink-0 shadow-sm">
                   {imagePreview ? (
                     <img src={imagePreview} alt="preview" className="w-full h-full object-cover" />
                   ) : (
-                    <ImageIcon size={24} className="text-gray-300" />
+                    <div className="flex flex-col items-center justify-center text-gray-400">
+                      <ImageIcon size={32} />
+                      <span className="text-xs mt-1">No image</span>
+                    </div>
                   )}
                 </div>
-                <label className="cursor-pointer inline-flex items-center gap-2 px-4 py-2.5 rounded-xl border border-gray-300 text-sm font-semibold text-gray-700 hover:bg-gray-50">
-                  <ImageIcon size={16} />
-                  {imagePreview ? 'Change image' : 'Upload image'}
-                  <input type="file" accept="image/*" onChange={handleImage} className="hidden" />
-                </label>
+                <div className="flex flex-col gap-2">
+                  <label className="cursor-pointer inline-flex items-center justify-center gap-2 px-5 py-2.5 rounded-xl border border-gray-300 text-sm font-semibold text-gray-700 hover:bg-white hover:border-[#8B4513] hover:text-[#8B4513] transition-all bg-white shadow-sm">
+                    <ImageIcon size={16} />
+                    {imagePreview ? 'Change Image' : 'Upload Image'}
+                    <input type="file" accept="image/*" onChange={handleImage} className="hidden" />
+                  </label>
+                  <p className="text-xs text-gray-500">Max file size: 5MB</p>
+                </div>
               </div>
 
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
@@ -278,9 +306,30 @@ const AdminProducts = ({ products, onRefresh }) => {
                 <datalist id="category-list">
                   {CATEGORY_SUGGESTIONS.map((c) => <option key={c} value={c} />)}
                 </datalist>
-                <Field label="Price (₹)" name="price" value={form.price} onChange={handleChange} type="number" required placeholder="120" />
+                <Field label="MRP (₹)" name="mrp" value={form.mrp} onChange={handleChange} type="number" placeholder="149" />
+                <Field label="Discount (%)" name="discount" value={form.discount} onChange={handleChange} type="number" placeholder="15" />
+                {!(Number(form.mrp) > 0) && (
+                  <Field label="Price (₹)" name="price" value={form.price} onChange={handleChange} type="number" required placeholder="120" />
+                )}
+                <Field label="GST (%)" name="gstRate" value={form.gstRate} onChange={handleChange} type="number" placeholder="5" list="gst-rates" />
+                <datalist id="gst-rates">
+                  {[0, 5, 18, 40].map((r) => <option key={r} value={r} />)}
+                </datalist>
                 <Field label="Stock" name="stock" value={form.stock} onChange={handleChange} type="number" placeholder="100" />
               </div>
+
+              {Number(form.mrp) > 0 && (
+                <p className="text-xs font-bold text-gray-600 bg-brand-cream/60 rounded-xl px-3.5 py-2.5">
+                  Selling price: <span className="text-[#8B4513]">₹{sellingPrice(form).toFixed(2)}</span>
+                  {' '}— {Number(form.discount) || 0}% off MRP ₹{Number(form.mrp).toFixed(2)}
+                </p>
+              )}
+              {sellingPrice(form) > 0 && (
+                <p className="text-xs font-bold text-gray-600 bg-brand-cream/60 rounded-xl px-3.5 py-2.5">
+                  Customer pays: <span className="text-[#8B4513]">₹{(sellingPrice(form) * (1 + (Number(form.gstRate) || 0) / 100)).toFixed(2)}</span>
+                  {' '}per unit — ₹{sellingPrice(form).toFixed(2)} + {Number(form.gstRate) || 0}% GST (shipping extra)
+                </p>
+              )}
 
               <Field label="Description" name="description" value={form.description} onChange={handleChange} required textarea placeholder="Short product description…" />
 
@@ -294,7 +343,7 @@ const AdminProducts = ({ products, onRefresh }) => {
               <Field label="Ingredients" name="ingredients" value={form.ingredients} onChange={handleChange} placeholder="100% Sugarcane" />
               <Field label="Storage" name="storage" value={form.storage} onChange={handleChange} placeholder="Store in a cool, dry place" />
 
-              <div className="flex gap-3 pt-2">
+              <div className="flex flex-col sm:flex-row gap-3 pt-2">
                 <button
                   type="button" onClick={closeForm}
                   className="flex-1 py-3 rounded-xl border border-gray-300 font-bold text-gray-700 hover:bg-gray-50 transition-colors"
@@ -303,7 +352,7 @@ const AdminProducts = ({ products, onRefresh }) => {
                 </button>
                 <button
                   type="submit" disabled={submitting}
-                  className="flex-1 py-3 rounded-xl bg-[#8B4513] text-[#FFF8DC] font-bold hover:bg-[#5D2E0C] transition-colors disabled:opacity-50"
+                  className="flex-1 py-3 rounded-xl bg-[#8B4513] text-[#FFF8DC] font-bold hover:bg-[#5D2E0C] transition-colors disabled:opacity-50 shadow-sm"
                 >
                   {submitting ? 'Saving…' : editingId ? 'Save Changes' : 'Create Product'}
                 </button>

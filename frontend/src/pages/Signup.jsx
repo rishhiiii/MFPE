@@ -1,8 +1,8 @@
 import React, { useState } from 'react';
-import { Link, useNavigate } from 'react-router-dom';
+import { Link, useNavigate, useLocation } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import { useAuth } from '../context/AuthContext';
-import { hasFirebaseConfig } from '../lib/firebase';
+import GoogleSignInButton from '../components/auth/GoogleSignInButton';
 import { User, Mail, Phone, Lock, UserPlus, ChevronRight } from 'lucide-react';
 import jaggeryHero from '../assets/jaggery hero new.jpeg';
 
@@ -15,9 +15,10 @@ const Signup = () => {
     confirmPassword: '',
   });
   const [isLoading, setIsLoading] = useState(false);
-  const [isGoogleLoading, setIsGoogleLoading] = useState(false);
   const { register, signInWithGoogle, error } = useAuth();
   const navigate = useNavigate();
+  const location = useLocation();
+  const redirectTo = location.state?.from || '/';
 
   const handleChange = (e) => {
     setFormData((prev) => ({ ...prev, [e.target.name]: e.target.value }));
@@ -32,27 +33,22 @@ const Signup = () => {
     setIsLoading(true);
 
     const result = await register(formData.name, formData.email, formData.password, formData.phone);
-    
+
     if (result.success) {
-      navigate('/');
+      navigate(redirectTo, { replace: true });
     }
     setIsLoading(false);
   };
 
-  const handleGoogleSignIn = async () => {
-    if (!hasFirebaseConfig) {
-      return;
-    }
-    setIsGoogleLoading(true);
-    const result = await signInWithGoogle();
+  const handleGoogleCredential = async (credential) => {
+    const result = await signInWithGoogle(credential);
     if (result.success) {
-      navigate('/');
+      navigate(redirectTo, { replace: true });
     }
-    setIsGoogleLoading(false);
   };
 
   return (
-    <div className="min-h-screen flex items-center py-32 pt-40">
+    <div className="hero-section min-h-screen flex items-center py-32 pt-40">
       {/* Background Image */}
       <div className="fixed inset-0 -z-10">
         <img
@@ -204,37 +200,7 @@ const Signup = () => {
             </motion.button>
 
             {/* Divider */}
-            <div className="relative my-6">
-              <div className="absolute inset-0 flex items-center">
-                <div className="w-full border-t border-white/20"></div>
-              </div>
-              <div className="relative flex justify-center">
-                <span className="bg-transparent px-4 text-white/60 font-semibold">or continue with</span>
-              </div>
-            </div>
-
-            {/* Google Button */}
-            <motion.button
-              whileHover={{ scale: 1.02 }}
-              whileTap={{ scale: 0.98 }}
-              type="button"
-              onClick={handleGoogleSignIn}
-              disabled={isGoogleLoading || !hasFirebaseConfig}
-              className="w-full bg-white/15 backdrop-blur-md border-2 border-white/25 text-white py-4 rounded-2xl font-bold text-lg flex items-center justify-center gap-3 hover:bg-white/25 transition-all duration-300 disabled:opacity-50"
-            >
-              <svg width="20" height="20" viewBox="0 0 20 20" fill="none">
-                <path d="M19.6 10.227c0-.709-.064-1.39-.182-2.045H10v3.868h5.382a4.6 4.6 0 0 1-1.996 3.018v2.51h3.232c1.891-1.742 2.982-4.305 2.982-7.35z" fill="#4285F4"/>
-                <path d="M10 20c2.7 0 4.964-.895 6.618-2.423l-3.232-2.509c-.895.6-2.04.955-3.386.955-2.605 0-4.81-1.76-5.595-4.123H1.064v2.59A9.996 9.996 0 0 0 10 20z" fill="#34A853"/>
-                <path d="M4.405 11.9a5.985 5.985 0 0 1 0-3.8V5.51H1.064A9.996 9.996 0 0 0 0 10c0 1.614.386 3.14 1.064 4.49l3.34-2.59z" fill="#FBBC05"/>
-                <path d="M10 3.977c1.468 0 2.786.505 3.823 1.496l2.868-2.868C14.959.99 12.695 0 10 0 6.09 0 2.71 2.24 1.064 5.51l3.34 2.59C5.19 5.736 7.395 3.977 10 3.977z" fill="#EA4335"/>
-              </svg>
-              {isGoogleLoading ? 'Signing in...' : hasFirebaseConfig ? 'Google' : 'Google setup required'}
-            </motion.button>
-            {!hasFirebaseConfig && (
-              <p className="text-sm text-white/70 text-center">
-                Add the `VITE_FIREBASE_*` values in `frontend/.env` to enable Google sign-in.
-              </p>
-            )}
+            <GoogleSignInButton onCredential={handleGoogleCredential} text="signup_with" />
           </motion.form>
 
           {/* Login Link */}
@@ -246,7 +212,7 @@ const Signup = () => {
           >
             <p className="text-white/70 text-lg">
               Already have an account?{' '}
-              <Link to="/login" className="text-brand-cream font-bold hover:text-white transition-colors underline">
+              <Link to="/login" state={location.state} className="text-brand-cream font-bold hover:text-white transition-colors underline">
                 Login
               </Link>
             </p>

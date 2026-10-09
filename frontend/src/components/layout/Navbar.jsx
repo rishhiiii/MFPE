@@ -84,11 +84,11 @@ const Navbar = () => {
                         <img src={mfpeLogo} alt="Mahaveer Food Products" className="w-12 h-12 object-cover rounded-full" />
                     </motion.div>
                     <div className="flex flex-col">
-                        <span className={`text-lg sm:text-xl font-black tracking-tight leading-none transition-colors duration-300 ${brandNameClass}`}>
+                        <span className={`font-logo text-lg sm:text-xl font-extrabold tracking-tight leading-none transition-colors duration-300 ${brandNameClass}`}>
                             MAHAVEER <span className={isScrolled ? 'text-[#8B4513]' : 'text-[#8B4513]'}>FOOD</span>
 
                         </span>
-                        <span className={`text-[9px] sm:text-[10px] font-black tracking-[0.16em] uppercase transition-colors duration-300 ${brandTaglineClass}`}>
+                        <span className={`font-logo text-[9px] sm:text-[10px] font-bold tracking-[0.16em] uppercase transition-colors duration-300 ${brandTaglineClass}`}>
                             Products And Exporters
                         </span>
                     </div>
@@ -171,7 +171,7 @@ const Navbar = () => {
                         </AnimatePresence>
                     </Link>
 
-                    {/* Auth Buttons — hidden below lg; available in the mobile menu instead */}
+                    {/* Auth Buttons — hidden below xl; available in the mobile menu instead */}
                     {user ? (
                         <div className="hidden lg:flex items-center gap-3">
                             {user.role === 'admin' && (
@@ -182,7 +182,13 @@ const Navbar = () => {
                                     <LayoutDashboard size={16} /> Admin
                                 </Link>
                             )}
-                            <span className={`text-sm font-semibold ${loginTextClass}`}>Hi, {user.name.split(' ')[0]}</span>
+                            <Link
+                                to="/profile"
+                                title="My account & orders"
+                                className={`inline-flex items-center gap-1.5 text-sm font-semibold hover:underline underline-offset-4 ${loginTextClass}`}
+                            >
+                                <User size={16} /> Hi, {user.name.split(' ')[0]}
+                            </Link>
                             <button
                                 onClick={logout}
                                 className={`p-2.5 rounded-full transition-all duration-300 ${defaultActionButton}`}
@@ -265,6 +271,13 @@ const Navbar = () => {
                                 {user ? (
                                     <div className="space-y-4">
                                         <p className="text-center text-lg font-semibold text-gray-700">Hi, {user.name}</p>
+                                        <Link
+                                            to="/profile"
+                                            onClick={() => setIsMobileMenuOpen(false)}
+                                            className="w-full bg-white text-gray-900 border border-gray-300 py-4 rounded-2xl font-black flex items-center justify-center gap-2"
+                                        >
+                                            <User size={20} /> My Account &amp; Orders
+                                        </Link>
                                         {user.role === 'admin' && (
                                             <Link
                                                 to="/admin"

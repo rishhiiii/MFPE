@@ -3,7 +3,7 @@ import Seo from './Seo';
 import { ROUTE_SEO, SITE } from '../../lib/seoConfig';
 
 // Paths whose pages render their own <Seo> (dynamic/data-driven metadata).
-const SELF_MANAGED = [/^\/product\//];
+const SELF_MANAGED = [/^\/product\//, /^\/blog\/.+/];
 
 /**
  * Applies per-route SEO metadata for all static pages from a central map.

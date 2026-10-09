@@ -7,19 +7,20 @@ import jaggery1 from '../assets/jaggery1.jpeg';
 import jaggery2 from '../assets/jaggery2.jpeg';
 import jaggery3 from '../assets/jaggery3.jpeg';
 import { API_BASE_URL } from '../lib/api';
+import { optimizeCloudinaryUrl } from '../lib/image';
 
 const getProductImage = (imagePath) => {
     if (!imagePath) return jaggery1;
-    if (imagePath.startsWith('http')) return imagePath;
+    if (imagePath.startsWith('http')) return optimizeCloudinaryUrl(imagePath, 250);
     if (imagePath.startsWith('/uploads')) return `${API_BASE_URL}${imagePath}`;
     return imagePath;
 };
 
 const Cart = () => {
-    const { cartItems, removeFromCart, addToCart, totalPrice } = useCart();
+    const { cartItems, removeFromCart, addToCart, totalPrice, gstTotal, shippingCharge, grandTotal } = useCart();
 
     return (
-        <div className="pt-28 pb-20 bg-brand-cream min-h-screen">
+        <div className="pt-40 pb-20 bg-brand-cream min-h-screen">
             <div className="max-w-full mx-auto px-6 sm:px-12 lg:px-20">
                 <div className="flex items-center gap-3 mb-10">
                     <div className="bg-brand-light p-2.5 rounded-xl text-brand-brown">
@@ -58,7 +59,7 @@ const Cart = () => {
                                         className="flex flex-col sm:flex-row items-center gap-5 bg-white p-5 rounded-xl border border-brand-brown/10 hover:shadow-lg hover:shadow-gray-50 transition-all"
                                     >
                                         <div className="w-28 h-28 rounded-xl overflow-hidden bg-brand-cream shrink-0">
-                                            <img src={getProductImage(item.image)} alt={item.name} className="w-full h-full object-cover" />
+                                            <img src={getProductImage(item.image)} alt={item.name} className="w-full h-full object-cover" loading="lazy" decoding="async" />
                                         </div>
                                         
                                         <div className="flex-grow text-center sm:text-left">
@@ -81,7 +82,7 @@ const Cart = () => {
                                                 </button>
                                                 <span className="w-9 text-center font-semibold text-base">{item.qty}</span>
                                                 <button 
-                                                    onClick={() => addToCart(item)} 
+                                                    onClick={() => addToCart({ ...item, qty: 1 })} 
                                                     className="w-9 h-9 flex items-center justify-center rounded-md hover:bg-white transition-all text-gray-600"
                                                 >
                                                     <Plus size={16} />
@@ -121,18 +122,18 @@ const Cart = () => {
                                 </div>
                                 <div className="flex justify-between text-white font-semibold text-sm">
                                     <span>Shipping</span>
-                                    <span className="text-brand-red font-bold uppercase tracking-widest text-[10px]">Free</span>
+                                    <span className="text-white">₹{Number(shippingCharge).toFixed(2)}</span>
                                 </div>
                                 <div className="flex justify-between text-white font-semibold text-sm">
-                                    <span>Tax (GST)</span>
-                                    <span className="text-white">Included</span>
+                                    <span>GST</span>
+                                    <span className="text-white">₹{Number(gstTotal).toFixed(2)}</span>
                                 </div>
                             </div>
 
                             <div className="border-t border-white/10 pt-5 mb-8 relative z-10">
                                 <div className="flex justify-between items-end">
                                     <span className="text-white font-semibold text-sm">Grand Total</span>
-                                    <span className="text-3xl font-bold text-brand-red">₹{Number(totalPrice).toFixed(2)}</span>
+                                    <span className="text-3xl font-bold text-brand-red">₹{Number(grandTotal).toFixed(2)}</span>
                                 </div>
                             </div>
 

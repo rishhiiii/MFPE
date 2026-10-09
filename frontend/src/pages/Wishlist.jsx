@@ -9,7 +9,7 @@ const Wishlist = () => {
   const { wishlistItems, addToCart, removeFromWishlist } = useCart();
 
   return (
-    <div className="pt-32 pb-24 bg-brand-cream min-h-screen">
+    <div className="pt-40 pb-24 bg-brand-cream min-h-screen">
       <div className="max-w-full mx-auto px-6 sm:px-12 lg:px-20">
         <motion.div 
           initial={{ opacity: 0, y: 20 }}

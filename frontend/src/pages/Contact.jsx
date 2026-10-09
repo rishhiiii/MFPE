@@ -37,7 +37,7 @@ const Contact = () => {
   };
 
   return (
-    <div className="pt-32 pb-24 bg-brand-cream min-h-screen">
+    <div className="pt-40 pb-24 bg-brand-cream min-h-screen">
       <div className="max-w-full mx-auto px-6 sm:px-12 lg:px-20">
         {/* Page Header */}
         <div className="max-w-3xl mx-auto text-center mb-16">
@@ -90,7 +90,7 @@ const Contact = () => {
                   </div>
                   <div>
                     <h4 className="text-sm text-gray-500 uppercase tracking-wider mb-1">Address</h4>
-                    <p className="text-lg font-medium text-gray-900">H.No. 4, Patrakar Colony, Link Road No. 3, Bhopal, Madhya Pradesh 462003</p>
+                    <p className="text-lg font-medium text-gray-900">Link Road No. 3, Kolar Road, Bhopal, Madhya Pradesh 462003</p>
                   </div>
                 </div>
 
