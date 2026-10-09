@@ -10,7 +10,7 @@ import jaggery2 from '../assets/jaggery2.jpeg';
 import jaggery1 from '../assets/jaggery1.jpeg';
 import jaggery3 from '../assets/jaggery3.jpeg';
 import jaggeryNew1 from '../assets/jaggery new 1.jpeg';
-import jaggeryNew6 from '../assets/jaggery new 6.jpeg';
+import featuredJaggery from '../assets/WhatsApp Image 2026-10-09 at 11.10.59 PM.jpeg';
 import jaggeryAbout from '../assets/jaggery new image.jpeg';
 import categorySuperfoods from '../assets/WhatsApp Image 2026-10-06 at 10.23.41 PM.jpeg';
 import categorySpices from '../assets/WhatsApp Image 2026-10-06 at 10.58.52 PM.jpeg';
@@ -75,10 +75,10 @@ const Home = () => {
                             viewport={{ once: true }}
                             className="relative"
                         >
-                            <div className="aspect-[4/3] rounded-2xl overflow-hidden border-4 border-white">
+                            <div className="aspect-[1312/1199] rounded-2xl overflow-hidden border-4 border-white">
                                 <img
-                                    src={jaggeryNew6}
-                                    alt="Premium Cane Jaggery"
+                                    src={featuredJaggery}
+                                    alt="Mahaveer Food 100% pure sugarcane cane jaggery (gud) pack"
                                     className="w-full h-full object-cover"
                                     loading="lazy"
                                     decoding="async"
