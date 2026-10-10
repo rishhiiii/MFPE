@@ -3,12 +3,24 @@ const router = express.Router();
 const Razorpay = require('razorpay');
 const crypto = require('crypto');
 const mongoose = require('mongoose');
+const rateLimit = require('express-rate-limit');
 const Order = require('../models/Order');
 const Product = require('../models/Product');
 const { isDbConnected } = require('../config/db');
 const { protect, admin, optionalAuth } = require('../middleware/authMiddleware');
 const { notifyOrderConfirmed, notifyPaymentFailed, notifyOrderStatus } = require('../utils/orderNotifications');
 const { escapeRegex } = require('../utils/regexEscape');
+
+// Throttle order creation: each call hits the Razorpay API and writes a
+// pending Order document, so this needs the same kind of protection as the
+// other write endpoints (auth, contact, reviews).
+const orderLimiter = rateLimit({
+    windowMs: 15 * 60 * 1000,
+    max: 10,
+    standardHeaders: true,
+    legacyHeaders: false,
+    message: { error: 'Too many order attempts. Please try again later.' },
+});
 
 const keyId = process.env.RAZORPAY_KEY_ID;
 const keySecret = process.env.RAZORPAY_KEY_SECRET;
@@ -88,7 +100,7 @@ const buildOrderFromItems = async (items) => {
 };
 
 // Create Razorpay order (server computes the amount + saves a pending order)
-router.post('/order', optionalAuth, async (req, res) => {
+router.post('/order', orderLimiter, optionalAuth, async (req, res) => {
     const { items, shippingAddress } = req.body;
 
     if (!isDbConnected()) {

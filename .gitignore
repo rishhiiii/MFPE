@@ -4,3 +4,7 @@
 .env.local
 .env.*.local
 node_modules
+
+# Local upload fallback (Cloudinary is the primary image store; see
+# config/multer.js, which creates this folder automatically if missing)
+backend/uploads/*

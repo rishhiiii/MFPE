@@ -22,10 +22,9 @@
     "express": "^5.2.1",
     "express-rate-limit": "^8.5.2",
     "jsonwebtoken": "^9.0.2",
-    "mfpe": "file:..",
     "mongoose": "^9.6.2",
     "multer": "^2.2.0",
-    "nodemailer": "^9.0.3",
+    "nodemailer": "^10.0.16",
     "nodemon": "^3.1.14",
     "razorpay": "^2.9.6",
     "streamifier": "^0.1.1"

@@ -308,7 +308,13 @@ const ProductDetail = () => {
                                     exit={{ opacity: 0, y: -10 }}
                                     className="space-y-4"
                                 >
-                                    <h3 className="text-xl font-black text-gray-900">About {product.name}</h3>
+                                    {/* h2 for correct heading order after the h1 above (no h2 existed in between).
+                                        index.css sets h2's font-size with !important, which an inline style on the
+                                        h2 itself couldn't override — so the h3-equivalent size is applied on an
+                                        inner span instead, keeping this visually identical to before. */}
+                                    <h2 className="font-black text-gray-900">
+                                        <span style={{ fontSize: 'clamp(1.2rem, 3vw + 0.3rem, 1.5rem)', lineHeight: 1.3 }}>About {product.name}</span>
+                                    </h2>
                                     <p className="text-base text-gray-600 font-medium leading-relaxed">
                                         {product.description}
                                     </p>

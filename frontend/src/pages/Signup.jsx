@@ -15,6 +15,7 @@ const Signup = () => {
     confirmPassword: '',
   });
   const [isLoading, setIsLoading] = useState(false);
+  const [formError, setFormError] = useState('');
   const { register, signInWithGoogle, error } = useAuth();
   const navigate = useNavigate();
   const location = useLocation();
@@ -26,8 +27,9 @@ const Signup = () => {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+    setFormError('');
     if (formData.password !== formData.confirmPassword) {
-      alert('Passwords do not match');
+      setFormError('Passwords do not match');
       return;
     }
     setIsLoading(true);
@@ -95,13 +97,13 @@ const Signup = () => {
             onSubmit={handleSubmit}
             className="space-y-4"
           >
-            {error && (
+            {(formError || error) && (
               <motion.div
                 initial={{ opacity: 0, scale: 0.95 }}
                 animate={{ opacity: 1, scale: 1 }}
                 className="bg-red-500/20 border border-red-400/30 text-red-100 px-5 py-3.5 rounded-2xl backdrop-blur-sm"
               >
-                {error}
+                {formError || error}
               </motion.div>
             )}
 
@@ -117,6 +119,7 @@ const Signup = () => {
                 onChange={handleChange}
                 className="w-full pl-12 pr-4 py-4 bg-white/10 backdrop-blur-md border-2 border-white/20 rounded-2xl text-white placeholder-white/50 focus:border-brand-cream focus:outline-none transition-all duration-300 font-medium"
                 placeholder="Full Name"
+                aria-label="Full Name"
                 required
               />
             </div>
@@ -133,6 +136,7 @@ const Signup = () => {
                 onChange={handleChange}
                 className="w-full pl-12 pr-4 py-4 bg-white/10 backdrop-blur-md border-2 border-white/20 rounded-2xl text-white placeholder-white/50 focus:border-brand-cream focus:outline-none transition-all duration-300 font-medium"
                 placeholder="Email Address"
+                aria-label="Email Address"
                 required
               />
             </div>
@@ -149,6 +153,7 @@ const Signup = () => {
                 onChange={handleChange}
                 className="w-full pl-12 pr-4 py-4 bg-white/10 backdrop-blur-md border-2 border-white/20 rounded-2xl text-white placeholder-white/50 focus:border-brand-cream focus:outline-none transition-all duration-300 font-medium"
                 placeholder="Phone Number"
+                aria-label="Phone Number"
               />
             </div>
 
@@ -164,6 +169,7 @@ const Signup = () => {
                 onChange={handleChange}
                 className="w-full pl-12 pr-4 py-4 bg-white/10 backdrop-blur-md border-2 border-white/20 rounded-2xl text-white placeholder-white/50 focus:border-brand-cream focus:outline-none transition-all duration-300 font-medium"
                 placeholder="Password"
+                aria-label="Password"
                 minLength={6}
                 required
               />
@@ -181,6 +187,7 @@ const Signup = () => {
                 onChange={handleChange}
                 className="w-full pl-12 pr-4 py-4 bg-white/10 backdrop-blur-md border-2 border-white/20 rounded-2xl text-white placeholder-white/50 focus:border-brand-cream focus:outline-none transition-all duration-300 font-medium"
                 placeholder="Confirm Password"
+                aria-label="Confirm Password"
                 minLength={6}
                 required
               />

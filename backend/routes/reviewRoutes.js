@@ -7,6 +7,7 @@ const Order = require('../models/Order');
 const { isDbConnected } = require('../config/db');
 const { protect } = require('../middleware/authMiddleware');
 const { escapeRegex } = require('../utils/regexEscape');
+const { stripHtml } = require('../utils/sanitize');
 
 // Mounted at /api/products/:productId/reviews
 const router = express.Router({ mergeParams: true });
@@ -94,7 +95,7 @@ router.get('/', async (req, res) => {
 router.post('/', protect, reviewLimiter, async (req, res) => {
     if (!requireDb(res) || !validProductId(req, res)) return;
     const rating = Number(req.body?.rating);
-    const comment = String(req.body?.comment || '').trim();
+    const comment = stripHtml(req.body?.comment || '').trim();
 
     if (!Number.isInteger(rating) || rating < 1 || rating > 5) {
         return res.status(400).json({ message: 'Please choose a rating from 1 to 5 stars.' });

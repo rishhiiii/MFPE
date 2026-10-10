@@ -1,34 +1,45 @@
-import React, { useEffect } from 'react';
+import React, { useEffect, Suspense, lazy } from 'react';
 import { BrowserRouter as Router, Routes, Route, useLocation } from 'react-router-dom';
 import Navbar from './components/layout/Navbar';
 import Footer from './components/layout/Footer';
-import Home from './pages/Home';
-import Shop from './pages/Shop';
-import Cart from './pages/Cart';
-import Wishlist from './pages/Wishlist';
-import Profile from './pages/Profile';
-import ProductDetail from './pages/ProductDetail';
-import About from './pages/About';
-import Contact from './pages/Contact';
-import Export from './pages/Export';
-import Wholesale from './pages/Wholesale';
-import Blog from './pages/Blog';
-import BlogPost from './pages/BlogPost';
-import Services from './pages/Services';
-import Checkout from './pages/Checkout';
-import Login from './pages/Login';
-import Signup from './pages/Signup';
-import AdminDashboard from './pages/admin/AdminDashboard';
 import AdminRoute from './components/admin/AdminRoute';
-import TermsAndConditions from './pages/TermsAndConditions';
-import PrivacyPolicy from './pages/PrivacyPolicy';
-import RefundPolicy from './pages/RefundPolicy';
-import ShippingPolicy from './pages/ShippingPolicy';
 import { CartProvider } from './context/CartContext';
 import { AuthProvider } from './context/AuthContext';
 import { AnimatePresence } from 'framer-motion';
 import { MessageCircle } from 'lucide-react';
 import RouteSeo from './components/seo/RouteSeo';
+
+// Pages are lazy-loaded so each route's code ships only when it's visited,
+// instead of one large bundle up front.
+const Home = lazy(() => import('./pages/Home'));
+const Shop = lazy(() => import('./pages/Shop'));
+const Cart = lazy(() => import('./pages/Cart'));
+const Wishlist = lazy(() => import('./pages/Wishlist'));
+const Profile = lazy(() => import('./pages/Profile'));
+const ProductDetail = lazy(() => import('./pages/ProductDetail'));
+const About = lazy(() => import('./pages/About'));
+const Contact = lazy(() => import('./pages/Contact'));
+const Export = lazy(() => import('./pages/Export'));
+const Wholesale = lazy(() => import('./pages/Wholesale'));
+const Blog = lazy(() => import('./pages/Blog'));
+const BlogPost = lazy(() => import('./pages/BlogPost'));
+const Services = lazy(() => import('./pages/Services'));
+const Checkout = lazy(() => import('./pages/Checkout'));
+const Login = lazy(() => import('./pages/Login'));
+const Signup = lazy(() => import('./pages/Signup'));
+const AdminDashboard = lazy(() => import('./pages/admin/AdminDashboard'));
+const TermsAndConditions = lazy(() => import('./pages/TermsAndConditions'));
+const PrivacyPolicy = lazy(() => import('./pages/PrivacyPolicy'));
+const RefundPolicy = lazy(() => import('./pages/RefundPolicy'));
+const ShippingPolicy = lazy(() => import('./pages/ShippingPolicy'));
+const NotFound = lazy(() => import('./pages/NotFound'));
+
+// Matches the loading spinner already used on pages like Shop/ProductDetail.
+const RouteFallback = () => (
+  <div className="min-h-screen flex justify-center items-center bg-white">
+    <div className="w-10 h-10 border-4 border-brand-light border-t-brand-red rounded-full animate-spin" />
+  </div>
+);
 
 function ScrollToTop() {
   const location = useLocation();
@@ -51,6 +62,7 @@ function App() {
             <Navbar />
             <main>
               <AnimatePresence mode="wait">
+              <Suspense fallback={<RouteFallback />}>
                 <Routes>
                   <Route path="/" element={<Home />} />
                   <Route path="/shop" element={<Shop />} />
@@ -80,7 +92,9 @@ function App() {
                   <Route path="/privacy-policy" element={<PrivacyPolicy />} />
                   <Route path="/refund-policy" element={<RefundPolicy />} />
                   <Route path="/shipping-policy" element={<ShippingPolicy />} />
+                  <Route path="*" element={<NotFound />} />
                 </Routes>
+              </Suspense>
               </AnimatePresence>
             </main>
             <Footer />

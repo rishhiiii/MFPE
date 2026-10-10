@@ -119,7 +119,7 @@ const OrderCard = ({ order, defaultOpen }) => {
                             <div className="md:col-span-3 space-y-3">
                                 {order.orderItems.map((it) => (
                                     <div key={`${it.product}-${it.name}`} className="flex items-center gap-3">
-                                        <img src={itemImage(it.image)} alt="" className="w-14 h-14 rounded-xl object-cover bg-gray-50" loading="lazy" />
+                                        <img src={itemImage(it.image)} alt={it.name} className="w-14 h-14 rounded-xl object-cover bg-gray-50" loading="lazy" />
                                         <div className="flex-1 min-w-0">
                                             <Link to={`/product/${it.product}`} className="font-semibold text-gray-900 hover:text-[#8B4513] line-clamp-1">
                                                 {it.name}

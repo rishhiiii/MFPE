@@ -14,7 +14,7 @@ const productSchema = mongoose.Schema({
     // Kept in sync from the Review collection (routes/reviewRoutes.js).
     rating: { type: Number, default: 0 },      // average stars, 0 when unrated
     numReviews: { type: Number, default: 0 },
-    category: { type: String, required: true }, // e.g. 'Jaggery', 'Papad'
+    category: { type: String, required: true, index: true }, // e.g. 'Jaggery', 'Papad'
     image: { type: String, required: false }, // Optional, since we might have placeholder
     stock: { type: Number, required: true, default: 0 },
     ingredients: { type: String, required: false, default: '' },

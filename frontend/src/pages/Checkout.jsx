@@ -56,6 +56,12 @@ const Checkout = () => {
 
     const [isProcessing, setIsProcessing] = useState(false);
     const [paymentSuccess, setPaymentSuccess] = useState(false);
+    const [formError, setFormError] = useState('');
+
+    const FIELD_LABELS = {
+        name: 'Full Name', email: 'Email Address', phone: 'Phone Number',
+        address: 'Address', city: 'City', state: 'State', pincode: 'Pincode',
+    };
 
     const handleInputChange = (e) => {
         const { name, value } = e.target;
@@ -74,10 +80,11 @@ const Checkout = () => {
 
     const handlePayment = async (e) => {
         e.preventDefault();
+        setFormError('');
 
         // Validate cart total
         if (totalPrice < 1) {
-            alert('Minimum order amount is ₹1');
+            setFormError('Minimum order amount is ₹1');
             return;
         }
 
@@ -85,7 +92,7 @@ const Checkout = () => {
         const requiredFields = ['name', 'email', 'phone', 'address', 'city', 'state', 'pincode'];
         for (const field of requiredFields) {
             if (!formData[field]) {
-                alert(`Please fill in ${field}`);
+                setFormError(`Please fill in ${FIELD_LABELS[field]}`);
                 return;
             }
         }
@@ -94,7 +101,7 @@ const Checkout = () => {
 
         const res = await loadRazorpay();
         if (!res) {
-            alert('Razorpay SDK failed to load. Are you online?');
+            setFormError('Razorpay SDK failed to load. Are you online?');
             setIsProcessing(false);
             return;
         }
@@ -139,12 +146,12 @@ const Checkout = () => {
                             setPaymentSuccess(true);
                             clearCart();
                         } else {
-                            alert('Payment verification failed. If money was debited, please contact us.');
+                            setFormError('Payment verification failed. If money was debited, please contact us.');
                             setIsProcessing(false);
                         }
                     } catch (err) {
                         console.error('Verification error:', err);
-                        alert('Payment verification failed. If money was debited, please contact us.');
+                        setFormError('Payment verification failed. If money was debited, please contact us.');
                         setIsProcessing(false);
                     }
                 },
@@ -164,15 +171,15 @@ const Checkout = () => {
                 api.post('/api/payment/failed', {
                     razorpay_order_id: response.error?.metadata?.order_id || order.id,
                 }).catch(() => {});
-                alert('Payment failed. Please try again.');
+                setFormError('Payment failed. Please try again.');
                 setIsProcessing(false);
             });
-            
+
             rzp.open();
         } catch (error) {
             console.error("Payment initiation failed", error);
             const message = error.response?.data?.error || error.message || 'Please try again.';
-            alert(`Payment failed to start: ${message}`);
+            setFormError(`Payment failed to start: ${message}`);
             setIsProcessing(false);
         }
     };
@@ -246,89 +253,101 @@ const Checkout = () => {
                             className="bg-white p-6 rounded-2xl border border-brand-brown/10"
                         >
                             <h2 className="text-xl font-bold text-gray-900 mb-6">Shipping Details</h2>
-                            
+
                             <form onSubmit={handlePayment} className="space-y-5">
+                                {formError && (
+                                    <div className="bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded-xl text-sm">
+                                        {formError}
+                                    </div>
+                                )}
                                 <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
                                     <div>
                                         <label className="block text-sm font-semibold text-gray-700 mb-2">Full Name *</label>
-                                        <input 
+                                        <input
                                             type="text"
                                             name="name"
                                             value={formData.name}
                                             onChange={handleInputChange}
                                             className="w-full px-4 py-3 rounded-xl border border-gray-300 focus:border-brand-brown focus:ring-2 focus:ring-brand-brown/20 outline-none"
                                             placeholder="John Doe"
+                                            required
                                         />
                                     </div>
                                     <div>
                                         <label className="block text-sm font-semibold text-gray-700 mb-2">Email Address *</label>
-                                        <input 
+                                        <input
                                             type="email"
                                             name="email"
                                             value={formData.email}
                                             onChange={handleInputChange}
                                             className="w-full px-4 py-3 rounded-xl border border-gray-300 focus:border-brand-brown focus:ring-2 focus:ring-brand-brown/20 outline-none"
                                             placeholder="john@example.com"
+                                            required
                                         />
                                     </div>
                                 </div>
-                                
+
                                 <div>
                                     <label className="block text-sm font-semibold text-gray-700 mb-2">Phone Number *</label>
-                                    <input 
+                                    <input
                                         type="tel"
                                         name="phone"
                                         value={formData.phone}
                                         onChange={handleInputChange}
                                         className="w-full px-4 py-3 rounded-xl border border-gray-300 focus:border-brand-brown focus:ring-2 focus:ring-brand-brown/20 outline-none"
                                         placeholder="+91 98765 43210"
+                                        required
                                     />
                                 </div>
-                                
+
                                 <div>
                                     <label className="block text-sm font-semibold text-gray-700 mb-2">Address *</label>
-                                    <textarea 
+                                    <textarea
                                         name="address"
                                         value={formData.address}
                                         onChange={handleInputChange}
                                         rows={3}
                                         className="w-full px-4 py-3 rounded-xl border border-gray-300 focus:border-brand-brown focus:ring-2 focus:ring-brand-brown/20 outline-none"
                                         placeholder="123 Main Street, Apartment 4B"
+                                        required
                                     />
                                 </div>
-                                
+
                                 <div className="grid grid-cols-1 md:grid-cols-3 gap-5">
                                     <div>
                                         <label className="block text-sm font-semibold text-gray-700 mb-2">City *</label>
-                                        <input 
+                                        <input
                                             type="text"
                                             name="city"
                                             value={formData.city}
                                             onChange={handleInputChange}
                                             className="w-full px-4 py-3 rounded-xl border border-gray-300 focus:border-brand-brown focus:ring-2 focus:ring-brand-brown/20 outline-none"
                                             placeholder="Mumbai"
+                                            required
                                         />
                                     </div>
                                     <div>
                                         <label className="block text-sm font-semibold text-gray-700 mb-2">State *</label>
-                                        <input 
+                                        <input
                                             type="text"
                                             name="state"
                                             value={formData.state}
                                             onChange={handleInputChange}
                                             className="w-full px-4 py-3 rounded-xl border border-gray-300 focus:border-brand-brown focus:ring-2 focus:ring-brand-brown/20 outline-none"
                                             placeholder="Maharashtra"
+                                            required
                                         />
                                     </div>
                                     <div>
                                         <label className="block text-sm font-semibold text-gray-700 mb-2">Pincode *</label>
-                                        <input 
+                                        <input
                                             type="text"
                                             name="pincode"
                                             value={formData.pincode}
                                             onChange={handleInputChange}
                                             className="w-full px-4 py-3 rounded-xl border border-gray-300 focus:border-brand-brown focus:ring-2 focus:ring-brand-brown/20 outline-none"
                                             placeholder="400001"
+                                            required
                                         />
                                     </div>
                                 </div>

@@ -107,6 +107,7 @@ const Login = () => {
                 onChange={handleChange}
                 className="w-full pl-12 pr-4 py-4 bg-white/10 backdrop-blur-md border-2 border-white/20 rounded-2xl text-gray-300 placeholder-white/50 focus:border-brand-cream focus:outline-none transition-all duration-300 font-medium"
                 placeholder="Email Address"
+                aria-label="Email Address"
                 required
               />
             </div>
@@ -123,6 +124,7 @@ const Login = () => {
                 onChange={handleChange}
                 className="w-full pl-12 pr-4 py-4 bg-white/10 backdrop-blur-md border-2 border-white/20 rounded-2xl text-gray-300 placeholder-white/50 focus:border-brand-cream focus:outline-none transition-all duration-300 font-medium"
                 placeholder="Password"
+                aria-label="Password"
                 required
               />
             </div>

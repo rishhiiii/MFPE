@@ -32,6 +32,10 @@ const generateToken = (id) => {
 router.post('/register', authLimiter, async (req, res) => {
   const { name, email, password, phone } = req.body;
 
+  if (!name || !email || !password) {
+    return res.status(400).json({ message: 'Name, email and password are required' });
+  }
+
   try {
     if (!isDbConnected()) {
       return res.status(503).json({ message: 'Database is unavailable' });
@@ -64,6 +68,12 @@ router.post('/register', authLimiter, async (req, res) => {
       res.status(400).json({ message: 'Invalid user data' });
     }
   } catch (error) {
+    // Mongoose validation errors (bad email format, password too short, ...)
+    // are the client's fault, not a server failure.
+    if (error.name === 'ValidationError') {
+      const message = Object.values(error.errors).map((e) => e.message).join(', ');
+      return res.status(400).json({ message });
+    }
     console.error(error);
     res.status(500).json({ message: 'Server error' });
   }
@@ -74,6 +84,10 @@ router.post('/register', authLimiter, async (req, res) => {
 // @access  Public
 router.post('/login', authLimiter, async (req, res) => {
   const { email, password } = req.body;
+
+  if (!email || !password) {
+    return res.status(400).json({ message: 'Email and password are required' });
+  }
 
   try {
     if (!isDbConnected()) {

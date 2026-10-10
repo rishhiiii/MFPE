@@ -5,6 +5,7 @@ const Contact = require('../models/Contact');
 const { isDbConnected } = require('../config/db');
 const { sendContactEmail } = require('../config/nodemailer');
 const { protect, admin } = require('../middleware/authMiddleware');
+const { stripHtml } = require('../utils/sanitize');
 
 const contactLimiter = rateLimit({
     windowMs: 10 * 60 * 1000, // 10 minutes
@@ -19,7 +20,7 @@ const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 // @desc   Submit a contact enquiry (public)
 // @route  POST /api/contact
 router.post('/', contactLimiter, async (req, res) => {
-    const { name, company, email, phone, message } = req.body;
+    let { name, company, email, phone, message } = req.body;
 
     if (!name || !email || !message) {
         return res.status(400).json({ error: 'Name, email, and message are required' });
@@ -27,6 +28,12 @@ router.post('/', contactLimiter, async (req, res) => {
     if (!emailRegex.test(email)) {
         return res.status(400).json({ error: 'Please provide a valid email address' });
     }
+
+    // Strip any HTML out of the free-text fields before they're stored/emailed.
+    name = stripHtml(name);
+    company = stripHtml(company);
+    phone = stripHtml(phone);
+    message = stripHtml(message);
 
     const dbUp = isDbConnected();
 
