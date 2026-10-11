@@ -117,7 +117,11 @@ const Checkout = () => {
             });
 
             const options = {
-                key: order.keyId || import.meta.env.VITE_RAZORPAY_KEY_ID,
+                // order.keyId normally comes from the backend's own RAZORPAY_KEY_ID;
+                // this is just a fallback, hardcoded (Razorpay's key_id is a public
+                // publishable key, not a secret — it's sent to the browser on every
+                // checkout regardless) so it never depends on a .env file at build time.
+                key: order.keyId || 'rzp_live_T8erhLyUftewxb',
                 amount: order.amount,
                 currency: order.currency || "INR",
                 name: "Mahaveer Food Products",

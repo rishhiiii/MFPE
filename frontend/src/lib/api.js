@@ -1,22 +1,14 @@
 import axios from 'axios';
 
-// Base URL for the backend. Comes from VITE_API_URL so the same code works in
-// local dev and in production (set VITE_API_URL to your deployed backend URL at
-// build time). Falls back to localhost for local development.
-//
-// VITE_API_URL must be set as an environment variable in your hosting
-// platform's dashboard (e.g. Vercel Settings > Environment Variables) — a
-// local .env file is gitignored and never reaches the production build, so
-// leaving it unset there silently falls back to localhost and every API call
-// fails on the live site.
-if (import.meta.env.PROD && !import.meta.env.VITE_API_URL) {
-  console.error(
-    '[config] VITE_API_URL is not set in this production build. ' +
-    'Set it in your hosting platform\'s environment variables (not just in a local .env file) and redeploy.'
-  );
-}
-
-export const API_BASE_URL = import.meta.env.VITE_API_URL || 'http://localhost:5000';
+// Base URL for the backend. Hardcoded directly rather than read from
+// VITE_API_URL: on the VPS deploy (git pull + npm run build directly on the
+// server), the .env file wasn't reliably present at build time, which made
+// Vite bake in the localhost fallback and broke every API call in production.
+// Baking the real URL directly into the source means a build always has the
+// right value, regardless of whether any .env file exists on the server.
+// Vite's own import.meta.env.DEV (not read from any .env file) still lets
+// local development hit a local backend instead.
+export const API_BASE_URL = import.meta.env.DEV ? 'http://localhost:5000' : 'https://api.mahaveerfood.com';
 
 // Centralized API client used for all backend requests.
 const api = axios.create({

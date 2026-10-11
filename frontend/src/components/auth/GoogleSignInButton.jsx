@@ -5,9 +5,12 @@ import React, { useEffect, useRef, useState } from 'react';
 // ID token ("credential") that the backend verifies at /api/auth/google.
 // https://developers.google.com/identity/gsi/web/guides/display-button
 //
-// Renders nothing until VITE_GOOGLE_CLIENT_ID is set.
+// Hardcoded directly (OAuth client IDs are public by design — every Google
+// sign-in request already sends this to the browser) rather than read from
+// VITE_GOOGLE_CLIENT_ID, so a build on the VPS never depends on a .env file
+// being present. Must match GOOGLE_CLIENT_ID in backend/.env.
 
-export const GOOGLE_CLIENT_ID = import.meta.env.VITE_GOOGLE_CLIENT_ID || '';
+export const GOOGLE_CLIENT_ID = '95355527115-90pbfhmjirgm5qgvpqe6k7k8fm0qntkc.apps.googleusercontent.com';
 
 const SCRIPT_SRC = 'https://accounts.google.com/gsi/client';
 let scriptPromise = null;
